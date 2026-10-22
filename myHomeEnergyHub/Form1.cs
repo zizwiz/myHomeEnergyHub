@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
@@ -11,6 +12,7 @@ namespace myHomeEnergyHub
 {
     public partial class Form1 : Form
     {
+
         public Form1()
         {
             InitializeComponent();
@@ -19,6 +21,8 @@ namespace myHomeEnergyHub
         private void Form1_Load(object sender, EventArgs e)
         {
             Text += " : v" + Assembly.GetExecutingAssembly().GetName().Version; // put in the version number
+
+            Database.Initialize();
         }
 
         private void btn_close_Click(object sender, EventArgs e)
@@ -78,7 +82,14 @@ namespace myHomeEnergyHub
                 // Merge into Import/Export columns
                 var merged = MergeImportExport(importData, exportData);
 
+                foreach (var row in merged)
+                {
+                    Database.InsertElectricity(row);
+                }
+
                 dgvElectric.DataSource = merged;
+                Database.overwriteMode = OverwriteChoice.Skip;
+
             }
             catch (Exception ex)
             {
@@ -95,13 +106,19 @@ namespace myHomeEnergyHub
 
             DateTime from = BuildDateTime(dtPicker_date_from, cmbobx_hour_from, cmbobx_minute_from);
             DateTime to = BuildDateTime(dtPicker_date_to, cmbobx_hour_to, cmbobx_minute_to);
-            
+
             var client = new OctopusClient(apiKey);
             var url = BuildGasUrl(mprn, serial, from, to);
 
-            var data = await client.GetConsumptionAsync(url);
+            var gasData = await client.GetConsumptionAsync(url);
 
-            dgvGas.DataSource = data.results;
+            foreach (var row in gasData.results) // add to database
+            {
+                Database.InsertGas(row);
+            }
+
+            dgvGas.DataSource = gasData.results;
+            Database.overwriteMode = OverwriteChoice.Skip;
         }
 
         private string BuildElectricUrl(string mpan, string serial, DateTime from, DateTime to)

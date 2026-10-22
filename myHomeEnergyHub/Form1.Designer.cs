@@ -34,7 +34,6 @@ namespace myHomeEnergyHub
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tab_dashboard = new System.Windows.Forms.TabPage();
             this.pnl_dashboard = new System.Windows.Forms.Panel();
-            this.btn_getinfo = new System.Windows.Forms.Button();
             this.btn_fill_data = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -44,7 +43,6 @@ namespace myHomeEnergyHub
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.rdoBoth = new System.Windows.Forms.RadioButton();
             this.rdoExport = new System.Windows.Forms.RadioButton();
-            this.rdobtn_gas = new System.Windows.Forms.RadioButton();
             this.rdoImport = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.txtbx_electric_export_mpan = new System.Windows.Forms.TextBox();
@@ -131,8 +129,6 @@ namespace myHomeEnergyHub
             // pnl_dashboard
             // 
             this.pnl_dashboard.Controls.Add(this.btnDownloadGas);
-            this.pnl_dashboard.Controls.Add(this.rdobtn_gas);
-            this.pnl_dashboard.Controls.Add(this.btn_getinfo);
             this.pnl_dashboard.Controls.Add(this.btn_fill_data);
             this.pnl_dashboard.Controls.Add(this.groupBox3);
             this.pnl_dashboard.Controls.Add(this.groupBox1);
@@ -143,24 +139,12 @@ namespace myHomeEnergyHub
             this.pnl_dashboard.Size = new System.Drawing.Size(1415, 484);
             this.pnl_dashboard.TabIndex = 0;
             // 
-            // btn_getinfo
-            // 
-            this.btn_getinfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_getinfo.Location = new System.Drawing.Point(719, 385);
-            this.btn_getinfo.Name = "btn_getinfo";
-            this.btn_getinfo.Size = new System.Drawing.Size(193, 45);
-            this.btn_getinfo.TabIndex = 31;
-            this.btn_getinfo.Text = "Get Info";
-            this.btn_getinfo.UseVisualStyleBackColor = true;
-            // 
             // btn_fill_data
             // 
             this.btn_fill_data.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_fill_data.Location = new System.Drawing.Point(1207, 294);
+            this.btn_fill_data.Location = new System.Drawing.Point(1218, 406);
             this.btn_fill_data.Name = "btn_fill_data";
             this.btn_fill_data.Size = new System.Drawing.Size(156, 45);
             this.btn_fill_data.TabIndex = 32;
@@ -254,16 +238,6 @@ namespace myHomeEnergyHub
             this.rdoExport.Text = "Export";
             this.rdoExport.UseVisualStyleBackColor = true;
             // 
-            // rdobtn_gas
-            // 
-            this.rdobtn_gas.AutoSize = true;
-            this.rdobtn_gas.Location = new System.Drawing.Point(639, 395);
-            this.rdobtn_gas.Name = "rdobtn_gas";
-            this.rdobtn_gas.Size = new System.Drawing.Size(64, 24);
-            this.rdobtn_gas.TabIndex = 2;
-            this.rdobtn_gas.Text = "Gas";
-            this.rdobtn_gas.UseVisualStyleBackColor = true;
-            // 
             // rdoImport
             // 
             this.rdoImport.AutoSize = true;
@@ -290,18 +264,18 @@ namespace myHomeEnergyHub
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.txtbx_api_key);
             this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Location = new System.Drawing.Point(740, 34);
+            this.groupBox2.Location = new System.Drawing.Point(621, 34);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(595, 241);
+            this.groupBox2.Size = new System.Drawing.Size(763, 241);
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Data";
+            this.groupBox2.Text = "Octopus Data";
             // 
             // txtbx_electric_export_mpan
             // 
             this.txtbx_electric_export_mpan.Location = new System.Drawing.Point(322, 96);
             this.txtbx_electric_export_mpan.Name = "txtbx_electric_export_mpan";
-            this.txtbx_electric_export_mpan.Size = new System.Drawing.Size(242, 26);
+            this.txtbx_electric_export_mpan.Size = new System.Drawing.Size(412, 26);
             this.txtbx_electric_export_mpan.TabIndex = 18;
             // 
             // label15
@@ -317,7 +291,7 @@ namespace myHomeEnergyHub
             // 
             this.txtbx_gas_serial_num.Location = new System.Drawing.Point(322, 192);
             this.txtbx_gas_serial_num.Name = "txtbx_gas_serial_num";
-            this.txtbx_gas_serial_num.Size = new System.Drawing.Size(242, 26);
+            this.txtbx_gas_serial_num.Size = new System.Drawing.Size(412, 26);
             this.txtbx_gas_serial_num.TabIndex = 16;
             // 
             // label5
@@ -333,7 +307,7 @@ namespace myHomeEnergyHub
             // 
             this.txtbx_gas_mprn.Location = new System.Drawing.Point(322, 160);
             this.txtbx_gas_mprn.Name = "txtbx_gas_mprn";
-            this.txtbx_gas_mprn.Size = new System.Drawing.Size(242, 26);
+            this.txtbx_gas_mprn.Size = new System.Drawing.Size(412, 26);
             this.txtbx_gas_mprn.TabIndex = 14;
             // 
             // label4
@@ -349,7 +323,7 @@ namespace myHomeEnergyHub
             // 
             this.txtbx_electric_serial_num.Location = new System.Drawing.Point(322, 128);
             this.txtbx_electric_serial_num.Name = "txtbx_electric_serial_num";
-            this.txtbx_electric_serial_num.Size = new System.Drawing.Size(242, 26);
+            this.txtbx_electric_serial_num.Size = new System.Drawing.Size(412, 26);
             this.txtbx_electric_serial_num.TabIndex = 12;
             // 
             // label3
@@ -365,7 +339,7 @@ namespace myHomeEnergyHub
             // 
             this.txtbx_electric_import_mpan.Location = new System.Drawing.Point(322, 64);
             this.txtbx_electric_import_mpan.Name = "txtbx_electric_import_mpan";
-            this.txtbx_electric_import_mpan.Size = new System.Drawing.Size(242, 26);
+            this.txtbx_electric_import_mpan.Size = new System.Drawing.Size(412, 26);
             this.txtbx_electric_import_mpan.TabIndex = 10;
             // 
             // label2
@@ -381,7 +355,7 @@ namespace myHomeEnergyHub
             // 
             this.txtbx_api_key.Location = new System.Drawing.Point(322, 32);
             this.txtbx_api_key.Name = "txtbx_api_key";
-            this.txtbx_api_key.Size = new System.Drawing.Size(242, 26);
+            this.txtbx_api_key.Size = new System.Drawing.Size(412, 26);
             this.txtbx_api_key.TabIndex = 8;
             // 
             // label1
@@ -590,13 +564,13 @@ namespace myHomeEnergyHub
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "myHomeEnergyHub";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tab_dashboard.ResumeLayout(false);
             this.pnl_dashboard.ResumeLayout(false);
-            this.pnl_dashboard.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -620,7 +594,6 @@ namespace myHomeEnergyHub
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tab_dashboard;
         private System.Windows.Forms.Panel pnl_dashboard;
-        private System.Windows.Forms.Button btn_getinfo;
         private System.Windows.Forms.Button btn_fill_data;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label7;
@@ -630,7 +603,6 @@ namespace myHomeEnergyHub
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton rdoBoth;
         private System.Windows.Forms.RadioButton rdoExport;
-        private System.Windows.Forms.RadioButton rdobtn_gas;
         private System.Windows.Forms.RadioButton rdoImport;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox txtbx_electric_export_mpan;
