@@ -212,13 +212,17 @@ namespace myHomeEnergyHub
             List<SolarRow> rows = null;
 
             string dimension = "day";
-            if (rdobtn_daily.Checked) dimension = "month";
+            if (rdobtn_monthly.Checked) dimension = "month";
             if (rdobtn_annually.Checked) dimension = "year";
 
             string raw = await GetFoxEssDailyReportAsync(apiKey, deviceSn, date, dimension);
             var response = JsonConvert.DeserializeObject<FoxResponse>(raw);
 
-            rows = BuildSolarRows(response, dimension);
+            string DataDate = date.ToString("dd MMM yyyy");
+            if (rdobtn_monthly.Checked) DataDate = date.ToString("MMM yyyy");
+            if (rdobtn_annually.Checked) DataDate = date.ToString("yyyy");
+
+            rows = BuildSolarRows(response, dimension, DataDate);
 
             dgvSolar.DataSource = rows;
 
@@ -290,13 +294,9 @@ namespace myHomeEnergyHub
             return result;
         }
 
-        public List<SolarRow> BuildSolarRows(FoxResponse response, string dimension)
+        public List<SolarRow> BuildSolarRows(FoxResponse response, string dimension, string myDataDate)
         {
             var rows = new List<SolarRow>();
-
-            var abc = response.result[0];
-
-
             int count = response.result[0].values.Length;
 
             for (int i = 0; i < count; i++)
@@ -311,35 +311,21 @@ namespace myHomeEnergyHub
                 else if (dimension == "year")
                     row.Period = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1);
 
+                // Store the date/month/year
+                row.Date = myDataDate;
+
                 foreach (var item in response.result)
                 {
                     decimal value = item.values[i];
 
                     switch (item.variable)
                     {
-                        case "feedin":
-                            row.FeedIn = value;
-                            break;
-
-                        case "gridConsumption":
-                            row.GridConsumption = value;
-                            break;
-
-                        case "chargeEnergyToTal":
-                            row.ChargeEnergy = value;
-                            break;
-
-                        case "dischargeEnergyToTal":
-                            row.DischargeEnergy = value;
-                            break;
-
-                        case "loads":
-                            row.Loads = value;
-                            break;
-
-                        case "PVEnergyTotal":
-                            row.PVEnergy = value;
-                            break;
+                        case "feedin": row.FeedIn = value; break;
+                        case "gridConsumption": row.GridConsumption = value; break;
+                        case "chargeEnergyToTal": row.ChargeEnergy = value; break;
+                        case "dischargeEnergyToTal": row.DischargeEnergy = value; break;
+                        case "loads": row.Loads = value; break;
+                        case "PVEnergyTotal": row.PVEnergy = value; break;
                     }
                 }
 
@@ -348,7 +334,6 @@ namespace myHomeEnergyHub
 
             return rows;
         }
-
 
     }
 }
