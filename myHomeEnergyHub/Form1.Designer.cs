@@ -80,8 +80,11 @@ namespace myHomeEnergyHub
             this.txtbx_foxess_device_id = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.dtSolarDate = new System.Windows.Forms.DateTimePicker();
-            this.btnTestSolar = new System.Windows.Forms.Button();
-            this.rchtxtbx_output = new System.Windows.Forms.RichTextBox();
+            this.grpbx_solar = new System.Windows.Forms.GroupBox();
+            this.rdobtn_daily = new System.Windows.Forms.RadioButton();
+            this.rdobtn_monthly = new System.Windows.Forms.RadioButton();
+            this.rdobtn_annually = new System.Windows.Forms.RadioButton();
+            this.rchtxbx_output = new System.Windows.Forms.RichTextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_dashboard.SuspendLayout();
@@ -99,6 +102,7 @@ namespace myHomeEnergyHub
             this.tab_solar_data.SuspendLayout();
             this.pnl_solar_data.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSolar)).BeginInit();
+            this.grpbx_solar.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -143,10 +147,8 @@ namespace myHomeEnergyHub
             // 
             // pnl_dashboard
             // 
-            this.pnl_dashboard.Controls.Add(this.rchtxtbx_output);
-            this.pnl_dashboard.Controls.Add(this.btnTestSolar);
-            this.pnl_dashboard.Controls.Add(this.dtSolarDate);
-            this.pnl_dashboard.Controls.Add(this.btnDownloadSolar);
+            this.pnl_dashboard.Controls.Add(this.rchtxbx_output);
+            this.pnl_dashboard.Controls.Add(this.grpbx_solar);
             this.pnl_dashboard.Controls.Add(this.btnDownloadGas);
             this.pnl_dashboard.Controls.Add(this.btn_fill_data);
             this.pnl_dashboard.Controls.Add(this.groupBox3);
@@ -483,7 +485,7 @@ namespace myHomeEnergyHub
             // 
             // btnDownloadGas
             // 
-            this.btnDownloadGas.Location = new System.Drawing.Point(24, 271);
+            this.btnDownloadGas.Location = new System.Drawing.Point(507, 400);
             this.btnDownloadGas.Name = "btnDownloadGas";
             this.btnDownloadGas.Size = new System.Drawing.Size(158, 50);
             this.btnDownloadGas.TabIndex = 34;
@@ -598,7 +600,7 @@ namespace myHomeEnergyHub
             // tab_solar_data
             // 
             this.tab_solar_data.Controls.Add(this.pnl_solar_data);
-            this.tab_solar_data.Location = new System.Drawing.Point(5, 29);
+            this.tab_solar_data.Location = new System.Drawing.Point(4, 29);
             this.tab_solar_data.Name = "tab_solar_data";
             this.tab_solar_data.Padding = new System.Windows.Forms.Padding(3);
             this.tab_solar_data.Size = new System.Drawing.Size(1421, 490);
@@ -628,7 +630,7 @@ namespace myHomeEnergyHub
             // 
             // btnDownloadSolar
             // 
-            this.btnDownloadSolar.Location = new System.Drawing.Point(24, 363);
+            this.btnDownloadSolar.Location = new System.Drawing.Point(194, 125);
             this.btnDownloadSolar.Name = "btnDownloadSolar";
             this.btnDownloadSolar.Size = new System.Drawing.Size(158, 50);
             this.btnDownloadSolar.TabIndex = 35;
@@ -656,28 +658,64 @@ namespace myHomeEnergyHub
             // 
             this.dtSolarDate.CustomFormat = "dd-MM-yyyy";
             this.dtSolarDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtSolarDate.Location = new System.Drawing.Point(226, 373);
+            this.dtSolarDate.Location = new System.Drawing.Point(210, 43);
             this.dtSolarDate.Name = "dtSolarDate";
             this.dtSolarDate.Size = new System.Drawing.Size(142, 26);
             this.dtSolarDate.TabIndex = 36;
             // 
-            // btnTestSolar
+            // grpbx_solar
             // 
-            this.btnTestSolar.Location = new System.Drawing.Point(552, 387);
-            this.btnTestSolar.Name = "btnTestSolar";
-            this.btnTestSolar.Size = new System.Drawing.Size(179, 63);
-            this.btnTestSolar.TabIndex = 37;
-            this.btnTestSolar.Text = "button1";
-            this.btnTestSolar.UseVisualStyleBackColor = true;
-            this.btnTestSolar.Click += new System.EventHandler(this.btnTestSolar_Click);
+            this.grpbx_solar.Controls.Add(this.rdobtn_annually);
+            this.grpbx_solar.Controls.Add(this.rdobtn_monthly);
+            this.grpbx_solar.Controls.Add(this.rdobtn_daily);
+            this.grpbx_solar.Controls.Add(this.dtSolarDate);
+            this.grpbx_solar.Controls.Add(this.btnDownloadSolar);
+            this.grpbx_solar.Location = new System.Drawing.Point(16, 254);
+            this.grpbx_solar.Name = "grpbx_solar";
+            this.grpbx_solar.Size = new System.Drawing.Size(380, 196);
+            this.grpbx_solar.TabIndex = 37;
+            this.grpbx_solar.TabStop = false;
+            this.grpbx_solar.Text = "Solar";
             // 
-            // rchtxtbx_output
+            // rdobtn_daily
             // 
-            this.rchtxtbx_output.Location = new System.Drawing.Point(835, 366);
-            this.rchtxtbx_output.Name = "rchtxtbx_output";
-            this.rchtxtbx_output.Size = new System.Drawing.Size(319, 98);
-            this.rchtxtbx_output.TabIndex = 38;
-            this.rchtxtbx_output.Text = "";
+            this.rdobtn_daily.AutoSize = true;
+            this.rdobtn_daily.Checked = true;
+            this.rdobtn_daily.Location = new System.Drawing.Point(28, 43);
+            this.rdobtn_daily.Name = "rdobtn_daily";
+            this.rdobtn_daily.Size = new System.Drawing.Size(68, 24);
+            this.rdobtn_daily.TabIndex = 37;
+            this.rdobtn_daily.TabStop = true;
+            this.rdobtn_daily.Text = "Daily";
+            this.rdobtn_daily.UseVisualStyleBackColor = true;
+            // 
+            // rdobtn_monthly
+            // 
+            this.rdobtn_monthly.AutoSize = true;
+            this.rdobtn_monthly.Location = new System.Drawing.Point(28, 73);
+            this.rdobtn_monthly.Name = "rdobtn_monthly";
+            this.rdobtn_monthly.Size = new System.Drawing.Size(89, 24);
+            this.rdobtn_monthly.TabIndex = 38;
+            this.rdobtn_monthly.Text = "Monthly";
+            this.rdobtn_monthly.UseVisualStyleBackColor = true;
+            // 
+            // rdobtn_annually
+            // 
+            this.rdobtn_annually.AutoSize = true;
+            this.rdobtn_annually.Location = new System.Drawing.Point(28, 103);
+            this.rdobtn_annually.Name = "rdobtn_annually";
+            this.rdobtn_annually.Size = new System.Drawing.Size(94, 24);
+            this.rdobtn_annually.TabIndex = 39;
+            this.rdobtn_annually.Text = "Annually";
+            this.rdobtn_annually.UseVisualStyleBackColor = true;
+            // 
+            // rchtxbx_output
+            // 
+            this.rchtxbx_output.Location = new System.Drawing.Point(813, 377);
+            this.rchtxbx_output.Name = "rchtxbx_output";
+            this.rchtxbx_output.Size = new System.Drawing.Size(314, 97);
+            this.rchtxbx_output.TabIndex = 38;
+            this.rchtxbx_output.Text = "";
             // 
             // Form1
             // 
@@ -710,6 +748,8 @@ namespace myHomeEnergyHub
             this.tab_solar_data.ResumeLayout(false);
             this.pnl_solar_data.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvSolar)).EndInit();
+            this.grpbx_solar.ResumeLayout(false);
+            this.grpbx_solar.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -766,8 +806,11 @@ namespace myHomeEnergyHub
         private System.Windows.Forms.TextBox txtbx_foxess_device_id;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.DateTimePicker dtSolarDate;
-        private System.Windows.Forms.Button btnTestSolar;
-        private System.Windows.Forms.RichTextBox rchtxtbx_output;
+        private System.Windows.Forms.GroupBox grpbx_solar;
+        private System.Windows.Forms.RadioButton rdobtn_annually;
+        private System.Windows.Forms.RadioButton rdobtn_monthly;
+        private System.Windows.Forms.RadioButton rdobtn_daily;
+        private System.Windows.Forms.RichTextBox rchtxbx_output;
     }
 }
 

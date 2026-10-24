@@ -199,40 +199,31 @@ namespace myHomeEnergyHub
                 .ToList();
         }
 
-        private async void btnDownloadSolar_Click(object sender, EventArgs e)
-        {
-            //try
-            //{
-            //    var apiKey = txtbx_foxess_api_key.Text;
-            //    var deviceId = txtbx_foxess_device_id.Text;
-            //    var date = dtSolarDate.Value.ToString("yyyy-MM-dd");
-
-            //    var client = new FoxEssClient(apiKey);
-
-            //    //  string url = $"https://www.foxesscloud.com/c/v0/device/energy/day?deviceID={deviceId}&date={date}";
-
-            //      string url = $"https://www.foxesscloud.com/c/v0/device/energy/day?deviceID={deviceId}&date={date}";
-
-            //    //string url = $"https://www.foxesscloud.com/op/api/device/device/energy/day?date={date}";
-
-            //    var result = await client.GetAsync<FoxDailyEnergyResponse>(url);
-               
-            //    dgvSolar.DataSource = new[] { result.data };
-
-            //    //string raw = await client.GetRawAsync(url);
-            //    //MessageBox.Show(raw);
-
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageBox.Show("Error: " + ex.Message);
-            //}
-        }
-       
         // FoxESS Solar Part
 
-       
+        private async void btnDownloadSolar_Click(object sender, EventArgs e)
+        {
+            dgvSolar.DataSource = null;
+            dgvSolar.Refresh();
+
+            string apiKey = txtbx_foxess_api_key.Text;
+            string deviceSn = txtbx_foxess_device_id.Text;
+            DateTime date = dtSolarDate.Value;
+            List<SolarRow> rows = null;
+
+            string dimension = "day";
+            if (rdobtn_daily.Checked) dimension = "month";
+            if (rdobtn_annually.Checked) dimension = "year";
+
+            string raw = await GetFoxEssDailyReportAsync(apiKey, deviceSn, date, dimension);
+            var response = JsonConvert.DeserializeObject<FoxResponse>(raw);
+
+            rows = BuildSolarRows(response, dimension);
+
+            dgvSolar.DataSource = rows;
+
+        }
+
         public static string Md5(string input)
         {
             using (var md5 = System.Security.Cryptography.MD5.Create())
@@ -261,32 +252,8 @@ namespace myHomeEnergyHub
 
             return client;
         }
-       
-        private async void btnTestSolar_Click(object sender, EventArgs e)
-        {
-            string apiKey = txtbx_foxess_api_key.Text;
-            string deviceSn = txtbx_foxess_device_id.Text;
-            DateTime date = DateTime.Today;
 
-           // string raw = await GetFoxEssDailyReportAsync(apiKey, deviceSn, DateTime.Today);
-
-
-            string raw = await GetFoxEssDailyReportAsync(apiKey, deviceSn, date);
-            var response = JsonConvert.DeserializeObject<FoxResponse>(raw);
-
-            var rows = BuildSolarRows(response, "day");
-
-            dgvSolar.DataSource = rows;
-
-
-
-            //rchtxtbx_output.AppendText(raw);
-
-            //MessageBox.Show(string.IsNullOrWhiteSpace(raw) ? "<empty>" : raw);
-        }
-
-
-        public async Task<string> GetFoxEssDailyReportAsync(string apiKey, string deviceSn, DateTime date)
+        public async Task<string> GetFoxEssDailyReportAsync(string apiKey, string deviceSn, DateTime date, string myDimension)
         {
             string path = "/op/v0/device/report/query";
             string url = "https://www.foxesscloud.com" + path;
@@ -305,7 +272,7 @@ namespace myHomeEnergyHub
                     "loads",
                     "PVEnergyTotal"
                 },
-                dimension = "day",
+                dimension = myDimension,
                 year = date.Year,
                 month = date.Month,
                 day = date.Day
@@ -318,12 +285,17 @@ namespace myHomeEnergyHub
             var response = await client.PostAsync(url, content);
             string result = await response.Content.ReadAsStringAsync();
 
+            rchtxbx_output.AppendText(result);
+
             return result;
         }
 
         public List<SolarRow> BuildSolarRows(FoxResponse response, string dimension)
         {
             var rows = new List<SolarRow>();
+
+            var abc = response.result[0];
+
 
             int count = response.result[0].values.Length;
 
