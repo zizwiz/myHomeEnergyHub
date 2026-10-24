@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using myHomeEnergyHub.Data;
-
+using Newtonsoft.Json;
 
 
 namespace myHomeEnergyHub
@@ -23,6 +27,11 @@ namespace myHomeEnergyHub
             Text += " : v" + Assembly.GetExecutingAssembly().GetName().Version; // put in the version number
 
             Database.Initialize();
+
+            cmbobx_hour_from.SelectedIndex = 0;
+            cmbobx_hour_to.SelectedIndex = 0;
+            cmbobx_minute_from.SelectedIndex = 0;
+            cmbobx_minute_to.SelectedIndex = 0;
         }
 
         private void btn_close_Click(object sender, EventArgs e)
@@ -35,7 +44,8 @@ namespace myHomeEnergyHub
 
             PrivateData.FillData(txtbx_api_key, txtbx_electric_serial_num,
                 txtbx_electric_import_mpan, txtbx_electric_export_mpan,
-                txtbx_gas_serial_num, txtbx_gas_mprn);
+                txtbx_gas_serial_num, txtbx_gas_mprn, txtbx_foxess_api_key,
+                txtbx_foxess_device_id);
         }
 
         private async void btnDownloadElectric_Click(object sender, EventArgs e)
@@ -188,6 +198,185 @@ namespace myHomeEnergyHub
                 .OrderBy(x => x.interval_start)
                 .ToList();
         }
+
+        private async void btnDownloadSolar_Click(object sender, EventArgs e)
+        {
+            //try
+            //{
+            //    var apiKey = txtbx_foxess_api_key.Text;
+            //    var deviceId = txtbx_foxess_device_id.Text;
+            //    var date = dtSolarDate.Value.ToString("yyyy-MM-dd");
+
+            //    var client = new FoxEssClient(apiKey);
+
+            //    //  string url = $"https://www.foxesscloud.com/c/v0/device/energy/day?deviceID={deviceId}&date={date}";
+
+            //      string url = $"https://www.foxesscloud.com/c/v0/device/energy/day?deviceID={deviceId}&date={date}";
+
+            //    //string url = $"https://www.foxesscloud.com/op/api/device/device/energy/day?date={date}";
+
+            //    var result = await client.GetAsync<FoxDailyEnergyResponse>(url);
+               
+            //    dgvSolar.DataSource = new[] { result.data };
+
+            //    //string raw = await client.GetRawAsync(url);
+            //    //MessageBox.Show(raw);
+
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Error: " + ex.Message);
+            //}
+        }
+       
+        // FoxESS Solar Part
+
+       
+        public static string Md5(string input)
+        {
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            {
+                var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+                var hash = md5.ComputeHash(bytes);
+                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            }
+        }
+
+        public static HttpClient BuildFoxEssClient(string apiKey, string path)
+        {
+            var client = new HttpClient();
+
+            string timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+
+            // Signature = MD5(path + "\r\n" + token + "\r\n" + timestamp)
+            string signatureInput = path + "\r\n" + apiKey + "\r\n" + timestamp;
+            string signature = Md5(signatureInput);
+
+            client.DefaultRequestHeaders.Add("Token", apiKey);
+            client.DefaultRequestHeaders.Add("Timestamp", timestamp);
+            client.DefaultRequestHeaders.Add("Signature", signature);
+            client.DefaultRequestHeaders.Add("Lang", "en");
+            client.DefaultRequestHeaders.Add("Timezone", "Europe/London");
+
+            return client;
+        }
+       
+        private async void btnTestSolar_Click(object sender, EventArgs e)
+        {
+            string apiKey = txtbx_foxess_api_key.Text;
+            string deviceSn = txtbx_foxess_device_id.Text;
+            DateTime date = DateTime.Today;
+
+           // string raw = await GetFoxEssDailyReportAsync(apiKey, deviceSn, DateTime.Today);
+
+
+            string raw = await GetFoxEssDailyReportAsync(apiKey, deviceSn, date);
+            var response = JsonConvert.DeserializeObject<FoxResponse>(raw);
+
+            var rows = BuildSolarRows(response, "day");
+
+            dgvSolar.DataSource = rows;
+
+
+
+            //rchtxtbx_output.AppendText(raw);
+
+            //MessageBox.Show(string.IsNullOrWhiteSpace(raw) ? "<empty>" : raw);
+        }
+
+
+        public async Task<string> GetFoxEssDailyReportAsync(string apiKey, string deviceSn, DateTime date)
+        {
+            string path = "/op/v0/device/report/query";
+            string url = "https://www.foxesscloud.com" + path;
+
+            var client = BuildFoxEssClient(apiKey, path);
+
+            var body = new
+            {
+                sn = deviceSn,
+                variables = new[]
+                {
+                    "feedin",
+                    "gridConsumption",
+                    "chargeEnergyToTal",
+                    "dischargeEnergyToTal",
+                    "loads",
+                    "PVEnergyTotal"
+                },
+                dimension = "day",
+                year = date.Year,
+                month = date.Month,
+                day = date.Day
+            };
+
+
+            string json = JsonConvert.SerializeObject(body);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync(url, content);
+            string result = await response.Content.ReadAsStringAsync();
+
+            return result;
+        }
+
+        public List<SolarRow> BuildSolarRows(FoxResponse response, string dimension)
+        {
+            var rows = new List<SolarRow>();
+
+            int count = response.result[0].values.Length;
+
+            for (int i = 0; i < count; i++)
+            {
+                var row = new SolarRow();
+
+                // Label the row depending on dimension
+                if (dimension == "day")
+                    row.Period = $"{i:00}:00";
+                else if (dimension == "month")
+                    row.Period = $"Day {i + 1}";
+                else if (dimension == "year")
+                    row.Period = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1);
+
+                foreach (var item in response.result)
+                {
+                    decimal value = item.values[i];
+
+                    switch (item.variable)
+                    {
+                        case "feedin":
+                            row.FeedIn = value;
+                            break;
+
+                        case "gridConsumption":
+                            row.GridConsumption = value;
+                            break;
+
+                        case "chargeEnergyToTal":
+                            row.ChargeEnergy = value;
+                            break;
+
+                        case "dischargeEnergyToTal":
+                            row.DischargeEnergy = value;
+                            break;
+
+                        case "loads":
+                            row.Loads = value;
+                            break;
+
+                        case "PVEnergyTotal":
+                            row.PVEnergy = value;
+                            break;
+                    }
+                }
+
+                rows.Add(row);
+            }
+
+            return rows;
+        }
+
 
     }
 }

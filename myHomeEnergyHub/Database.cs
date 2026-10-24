@@ -42,6 +42,18 @@ namespace myHomeEnergyHub
                 );
             ";
 
+                string sqlSolar = @"
+                CREATE TABLE IF NOT EXISTS SolarDaily(
+                    date TEXT PRIMARY KEY,
+                    pvEnergy REAL,
+                gridImport REAL,
+                    gridExport REAL,
+                batteryCharge REAL,
+                    batteryDischarge REAL,
+                loadEnergy REAL
+                    );";
+
+
                 using (var cmd = new SQLiteCommand(sqlElectric, conn))
                     cmd.ExecuteNonQuery();
 
@@ -92,8 +104,8 @@ namespace myHomeEnergyHub
                 }
 
             // Insert or replace
-            DoInsert: 
-            string insertSql = @"
+            DoInsert:
+                string insertSql = @"
             INSERT OR REPLACE INTO ElectricityConsumption
             (interval_start, interval_end, import, export)
             VALUES (@start, @end, @import, @export);
@@ -150,8 +162,8 @@ namespace myHomeEnergyHub
                 }
 
             // Insert or replace
-            DoInsert: 
-            string insertSql = @"
+            DoInsert:
+                string insertSql = @"
             INSERT OR REPLACE INTO GasConsumption
             (interval_start, interval_end, consumption)
             VALUES (@start, @end, @consumption);
@@ -167,5 +179,33 @@ namespace myHomeEnergyHub
                 }
             }
         }
+
+        public static void InsertSolar(FoxDailyEnergyData item, DateTime date)
+        {
+            using (var conn = new SQLiteConnection("Data Source=" + DbPath))
+            {
+                conn.Open();
+
+                string sql = @"
+            INSERT OR REPLACE INTO SolarDaily
+            (date, pvEnergy, gridImport, gridExport, batteryCharge, batteryDischarge, loadEnergy)
+            VALUES (@date, @pv, @import, @export, @charge, @discharge, @load);
+        ";
+
+                using (var cmd = new SQLiteCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@date", date.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@pv", item.pvEnergy);
+                    cmd.Parameters.AddWithValue("@import", item.gridImport);
+                    cmd.Parameters.AddWithValue("@export", item.gridExport);
+                    cmd.Parameters.AddWithValue("@charge", item.batteryCharge);
+                    cmd.Parameters.AddWithValue("@discharge", item.batteryDischarge);
+                    cmd.Parameters.AddWithValue("@load", item.loadEnergy);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
     }
 }

@@ -61,6 +61,8 @@
     <Compile Include="FormOverwriteDialog.Designer.cs">
       <DependentUpon>FormOverwriteDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="FoxEssClient.cs" />
+    <Compile Include="FoxEssModels.cs" />
     <Compile Include="OctopusClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

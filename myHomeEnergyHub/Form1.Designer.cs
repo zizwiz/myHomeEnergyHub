@@ -71,6 +71,17 @@ namespace myHomeEnergyHub
             this.cmbobx_minute_to = new System.Windows.Forms.ComboBox();
             this.cmbobx_hour_from = new System.Windows.Forms.ComboBox();
             this.cmbobx_minute_from = new System.Windows.Forms.ComboBox();
+            this.txtbx_foxess_api_key = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.tab_solar_data = new System.Windows.Forms.TabPage();
+            this.pnl_solar_data = new System.Windows.Forms.Panel();
+            this.dgvSolar = new System.Windows.Forms.DataGridView();
+            this.btnDownloadSolar = new System.Windows.Forms.Button();
+            this.txtbx_foxess_device_id = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.dtSolarDate = new System.Windows.Forms.DateTimePicker();
+            this.btnTestSolar = new System.Windows.Forms.Button();
+            this.rchtxtbx_output = new System.Windows.Forms.RichTextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tab_dashboard.SuspendLayout();
@@ -85,6 +96,9 @@ namespace myHomeEnergyHub
             this.pnl_gas_data.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvElectric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvGas)).BeginInit();
+            this.tab_solar_data.SuspendLayout();
+            this.pnl_solar_data.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSolar)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -108,6 +122,7 @@ namespace myHomeEnergyHub
             this.tabControl1.Controls.Add(this.tab_dashboard);
             this.tabControl1.Controls.Add(this.tab_electric_data);
             this.tabControl1.Controls.Add(this.tab_gas_data);
+            this.tabControl1.Controls.Add(this.tab_solar_data);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(3, 83);
             this.tabControl1.Name = "tabControl1";
@@ -128,6 +143,10 @@ namespace myHomeEnergyHub
             // 
             // pnl_dashboard
             // 
+            this.pnl_dashboard.Controls.Add(this.rchtxtbx_output);
+            this.pnl_dashboard.Controls.Add(this.btnTestSolar);
+            this.pnl_dashboard.Controls.Add(this.dtSolarDate);
+            this.pnl_dashboard.Controls.Add(this.btnDownloadSolar);
             this.pnl_dashboard.Controls.Add(this.btnDownloadGas);
             this.pnl_dashboard.Controls.Add(this.btn_fill_data);
             this.pnl_dashboard.Controls.Add(this.groupBox3);
@@ -252,6 +271,10 @@ namespace myHomeEnergyHub
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.txtbx_foxess_device_id);
+            this.groupBox2.Controls.Add(this.label9);
+            this.groupBox2.Controls.Add(this.txtbx_foxess_api_key);
+            this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.txtbx_electric_export_mpan);
             this.groupBox2.Controls.Add(this.label15);
             this.groupBox2.Controls.Add(this.txtbx_gas_serial_num);
@@ -266,7 +289,7 @@ namespace myHomeEnergyHub
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(621, 34);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(763, 241);
+            this.groupBox2.Size = new System.Drawing.Size(763, 324);
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Octopus Data";
@@ -556,6 +579,106 @@ namespace myHomeEnergyHub
             this.cmbobx_minute_from.Size = new System.Drawing.Size(61, 28);
             this.cmbobx_minute_from.TabIndex = 25;
             // 
+            // txtbx_foxess_api_key
+            // 
+            this.txtbx_foxess_api_key.Location = new System.Drawing.Point(322, 283);
+            this.txtbx_foxess_api_key.Name = "txtbx_foxess_api_key";
+            this.txtbx_foxess_api_key.Size = new System.Drawing.Size(412, 26);
+            this.txtbx_foxess_api_key.TabIndex = 20;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 283);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(128, 20);
+            this.label8.TabIndex = 19;
+            this.label8.Text = "FoxESS API Key";
+            // 
+            // tab_solar_data
+            // 
+            this.tab_solar_data.Controls.Add(this.pnl_solar_data);
+            this.tab_solar_data.Location = new System.Drawing.Point(5, 29);
+            this.tab_solar_data.Name = "tab_solar_data";
+            this.tab_solar_data.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_solar_data.Size = new System.Drawing.Size(1421, 490);
+            this.tab_solar_data.TabIndex = 3;
+            this.tab_solar_data.Text = "Solar Data";
+            this.tab_solar_data.UseVisualStyleBackColor = true;
+            // 
+            // pnl_solar_data
+            // 
+            this.pnl_solar_data.Controls.Add(this.dgvSolar);
+            this.pnl_solar_data.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnl_solar_data.Location = new System.Drawing.Point(3, 3);
+            this.pnl_solar_data.Name = "pnl_solar_data";
+            this.pnl_solar_data.Size = new System.Drawing.Size(1415, 484);
+            this.pnl_solar_data.TabIndex = 0;
+            // 
+            // dgvSolar
+            // 
+            this.dgvSolar.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvSolar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvSolar.Location = new System.Drawing.Point(0, 0);
+            this.dgvSolar.Name = "dgvSolar";
+            this.dgvSolar.RowHeadersWidth = 62;
+            this.dgvSolar.RowTemplate.Height = 28;
+            this.dgvSolar.Size = new System.Drawing.Size(1415, 484);
+            this.dgvSolar.TabIndex = 0;
+            // 
+            // btnDownloadSolar
+            // 
+            this.btnDownloadSolar.Location = new System.Drawing.Point(24, 363);
+            this.btnDownloadSolar.Name = "btnDownloadSolar";
+            this.btnDownloadSolar.Size = new System.Drawing.Size(158, 50);
+            this.btnDownloadSolar.TabIndex = 35;
+            this.btnDownloadSolar.Text = "Download Solar";
+            this.btnDownloadSolar.UseVisualStyleBackColor = true;
+            this.btnDownloadSolar.Click += new System.EventHandler(this.btnDownloadSolar_Click);
+            // 
+            // txtbx_foxess_device_id
+            // 
+            this.txtbx_foxess_device_id.Location = new System.Drawing.Point(322, 248);
+            this.txtbx_foxess_device_id.Name = "txtbx_foxess_device_id";
+            this.txtbx_foxess_device_id.Size = new System.Drawing.Size(412, 26);
+            this.txtbx_foxess_device_id.TabIndex = 22;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 248);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(141, 20);
+            this.label9.TabIndex = 21;
+            this.label9.Text = "FoxESS Device ID";
+            // 
+            // dtSolarDate
+            // 
+            this.dtSolarDate.CustomFormat = "dd-MM-yyyy";
+            this.dtSolarDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtSolarDate.Location = new System.Drawing.Point(226, 373);
+            this.dtSolarDate.Name = "dtSolarDate";
+            this.dtSolarDate.Size = new System.Drawing.Size(142, 26);
+            this.dtSolarDate.TabIndex = 36;
+            // 
+            // btnTestSolar
+            // 
+            this.btnTestSolar.Location = new System.Drawing.Point(552, 387);
+            this.btnTestSolar.Name = "btnTestSolar";
+            this.btnTestSolar.Size = new System.Drawing.Size(179, 63);
+            this.btnTestSolar.TabIndex = 37;
+            this.btnTestSolar.Text = "button1";
+            this.btnTestSolar.UseVisualStyleBackColor = true;
+            this.btnTestSolar.Click += new System.EventHandler(this.btnTestSolar_Click);
+            // 
+            // rchtxtbx_output
+            // 
+            this.rchtxtbx_output.Location = new System.Drawing.Point(835, 366);
+            this.rchtxtbx_output.Name = "rchtxtbx_output";
+            this.rchtxtbx_output.Size = new System.Drawing.Size(319, 98);
+            this.rchtxtbx_output.TabIndex = 38;
+            this.rchtxtbx_output.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -584,6 +707,9 @@ namespace myHomeEnergyHub
             this.pnl_gas_data.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvElectric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvGas)).EndInit();
+            this.tab_solar_data.ResumeLayout(false);
+            this.pnl_solar_data.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvSolar)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -631,6 +757,17 @@ namespace myHomeEnergyHub
         private System.Windows.Forms.ComboBox cmbobx_hour_to;
         private System.Windows.Forms.ComboBox cmbobx_minute_from;
         private System.Windows.Forms.ComboBox cmbobx_hour_from;
+        private System.Windows.Forms.TextBox txtbx_foxess_api_key;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TabPage tab_solar_data;
+        private System.Windows.Forms.Panel pnl_solar_data;
+        private System.Windows.Forms.DataGridView dgvSolar;
+        private System.Windows.Forms.Button btnDownloadSolar;
+        private System.Windows.Forms.TextBox txtbx_foxess_device_id;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.DateTimePicker dtSolarDate;
+        private System.Windows.Forms.Button btnTestSolar;
+        private System.Windows.Forms.RichTextBox rchtxtbx_output;
     }
 }
 
