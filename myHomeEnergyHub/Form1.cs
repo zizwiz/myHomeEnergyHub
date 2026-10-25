@@ -92,13 +92,14 @@ namespace myHomeEnergyHub
                 // Merge into Import/Export columns
                 var merged = MergeImportExport(importData, exportData);
 
+                Database.overwriteMode = OverwriteChoice.Ask; //reset
+
                 foreach (var row in merged)
                 {
                     Database.InsertElectricity(row);
                 }
 
                 dgvElectric.DataSource = merged;
-                Database.overwriteMode = OverwriteChoice.Skip;
 
             }
             catch (Exception ex)
@@ -122,13 +123,13 @@ namespace myHomeEnergyHub
 
             var gasData = await client.GetConsumptionAsync(url);
 
+            Database.overwriteMode = OverwriteChoice.Ask; //reset
             foreach (var row in gasData.results) // add to database
             {
                 Database.InsertGas(row);
             }
 
             dgvGas.DataSource = gasData.results;
-            Database.overwriteMode = OverwriteChoice.Skip;
         }
 
         private string BuildElectricUrl(string mpan, string serial, DateTime from, DateTime to)
@@ -209,24 +210,27 @@ namespace myHomeEnergyHub
             string apiKey = txtbx_foxess_api_key.Text;
             string deviceSn = txtbx_foxess_device_id.Text;
             DateTime date = dtSolarDate.Value;
-            List<SolarRow> rows = null;
 
             string dimension = "day";
             if (rdobtn_monthly.Checked) dimension = "month";
             if (rdobtn_annually.Checked) dimension = "year";
 
+            // Reset overwrite mode BEFORE inserting
+            Database.overwriteMode = OverwriteChoice.Ask;
+
             string raw = await GetFoxEssDailyReportAsync(apiKey, deviceSn, date, dimension);
             var response = JsonConvert.DeserializeObject<FoxResponse>(raw);
 
-            string DataDate = date.ToString("dd MMM yyyy");
-            if (rdobtn_monthly.Checked) DataDate = date.ToString("MMM yyyy");
-            if (rdobtn_annually.Checked) DataDate = date.ToString("yyyy");
-
-            rows = BuildSolarRows(response, dimension, DataDate);
+            var rows = BuildSolarRows(response, dimension, date);
 
             dgvSolar.DataSource = rows;
 
+            foreach (var row in rows)
+            {
+                Database.InsertSolarRow(row, dimension);
+            }
         }
+
 
         public static string Md5(string input)
         {
@@ -294,7 +298,7 @@ namespace myHomeEnergyHub
             return result;
         }
 
-        public List<SolarRow> BuildSolarRows(FoxResponse response, string dimension, string myDataDate)
+        public List<SolarRow> BuildSolarRows(FoxResponse response, string dimension, DateTime date)
         {
             var rows = new List<SolarRow>();
             int count = response.result[0].values.Length;
@@ -303,7 +307,18 @@ namespace myHomeEnergyHub
             {
                 var row = new SolarRow();
 
-                // Label the row depending on dimension
+                // REAL date stored internally
+                row.Date = date;
+
+                // PRETTY date for UI
+                if (dimension == "day")
+                    row.DisplayDate = date.ToString("dd MMM yyyy");
+                else if (dimension == "month")
+                    row.DisplayDate = date.ToString("MMM yyyy");
+                else if (dimension == "year")
+                    row.DisplayDate = date.ToString("yyyy");
+
+                // Period label
                 if (dimension == "day")
                     row.Period = $"{i:00}:00";
                 else if (dimension == "month")
@@ -311,9 +326,7 @@ namespace myHomeEnergyHub
                 else if (dimension == "year")
                     row.Period = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1);
 
-                // Store the date/month/year
-                row.Date = myDataDate;
-
+                // Fill values
                 foreach (var item in response.result)
                 {
                     decimal value = item.values[i];

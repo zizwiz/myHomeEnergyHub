@@ -9,8 +9,14 @@ namespace myHomeEnergyHub
 
     public class SolarRow
     {
-        public string Period { get; set; }   // "00:00", "Day 1", "January"
-        public string Date { get; set; }   // The date/month/year the row belongs to
+        public string Period { get; set; }
+
+        // REAL date used for database and duplicate detection
+        public DateTime Date { get; set; }
+
+        // PRETTY date used only for UI
+        public string DisplayDate { get; set; }
+
         public decimal FeedIn { get; set; }
         public decimal GridConsumption { get; set; }
         public decimal ChargeEnergy { get; set; }
@@ -18,7 +24,6 @@ namespace myHomeEnergyHub
         public decimal Loads { get; set; }
         public decimal PVEnergy { get; set; }
     }
-
 
     public class FoxResultItem
     {

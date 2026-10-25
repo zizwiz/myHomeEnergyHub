@@ -453,10 +453,14 @@ namespace myHomeEnergyHub
             // 
             // dgvElectric
             // 
+            this.dgvElectric.AllowUserToAddRows = false;
+            this.dgvElectric.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvElectric.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvElectric.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvElectric.Location = new System.Drawing.Point(0, 0);
             this.dgvElectric.Name = "dgvElectric";
+            this.dgvElectric.ReadOnly = true;
+            this.dgvElectric.RowHeadersVisible = false;
             this.dgvElectric.RowHeadersWidth = 62;
             this.dgvElectric.RowTemplate.Height = 28;
             this.dgvElectric.Size = new System.Drawing.Size(1415, 484);
@@ -464,10 +468,14 @@ namespace myHomeEnergyHub
             // 
             // dgvGas
             // 
+            this.dgvGas.AllowUserToAddRows = false;
+            this.dgvGas.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvGas.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvGas.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvGas.Location = new System.Drawing.Point(0, 0);
             this.dgvGas.Name = "dgvGas";
+            this.dgvGas.ReadOnly = true;
+            this.dgvGas.RowHeadersVisible = false;
             this.dgvGas.RowHeadersWidth = 62;
             this.dgvGas.RowTemplate.Height = 28;
             this.dgvGas.Size = new System.Drawing.Size(1415, 484);
@@ -619,10 +627,14 @@ namespace myHomeEnergyHub
             // 
             // dgvSolar
             // 
+            this.dgvSolar.AllowUserToAddRows = false;
+            this.dgvSolar.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvSolar.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvSolar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvSolar.Location = new System.Drawing.Point(0, 0);
             this.dgvSolar.Name = "dgvSolar";
+            this.dgvSolar.ReadOnly = true;
+            this.dgvSolar.RowHeadersVisible = false;
             this.dgvSolar.RowHeadersWidth = 62;
             this.dgvSolar.RowTemplate.Height = 28;
             this.dgvSolar.Size = new System.Drawing.Size(1415, 484);
@@ -662,6 +674,7 @@ namespace myHomeEnergyHub
             this.dtSolarDate.Name = "dtSolarDate";
             this.dtSolarDate.Size = new System.Drawing.Size(142, 26);
             this.dtSolarDate.TabIndex = 36;
+            this.dtSolarDate.Value = new System.DateTime(2026, 10, 25, 13, 57, 13, 0);
             // 
             // grpbx_solar
             // 

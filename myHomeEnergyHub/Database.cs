@@ -43,21 +43,24 @@ namespace myHomeEnergyHub
             ";
 
                 string sqlSolar = @"
-                CREATE TABLE IF NOT EXISTS SolarDaily(
-                    date TEXT PRIMARY KEY,
+                CREATE TABLE IF NOT EXISTS SolarData (
+                    date TEXT,
+                    period TEXT,
+                    feedin REAL,
+                    gridConsumption REAL,
+                    chargeEnergy REAL,
+                    dischargeEnergy REAL,
+                    loads REAL,
                     pvEnergy REAL,
-                gridImport REAL,
-                    gridExport REAL,
-                batteryCharge REAL,
-                    batteryDischarge REAL,
-                loadEnergy REAL
-                    );";
-
-
+                    dimension TEXT,
+                    PRIMARY KEY (date, period, dimension)
+                );
+            ";
+                
                 using (var cmd = new SQLiteCommand(sqlElectric, conn))
                     cmd.ExecuteNonQuery();
 
-                using (var cmd = new SQLiteCommand(sqlGas, conn))
+                using (var cmd = new SQLiteCommand(sqlSolar, conn))
                     cmd.ExecuteNonQuery();
             }
         }
@@ -180,32 +183,90 @@ namespace myHomeEnergyHub
             }
         }
 
-        public static void InsertSolar(FoxDailyEnergyData item, DateTime date)
+        public static void InsertSolarRow(SolarRow row, string dimension)
         {
             using (var conn = new SQLiteConnection("Data Source=" + DbPath))
             {
                 conn.Open();
 
-                string sql = @"
-            INSERT OR REPLACE INTO SolarDaily
-            (date, pvEnergy, gridImport, gridExport, batteryCharge, batteryDischarge, loadEnergy)
-            VALUES (@date, @pv, @import, @export, @charge, @discharge, @load);
+                string checkSql = @"
+            SELECT COUNT(*) FROM SolarData
+            WHERE date = @date AND period = @period AND dimension = @dimension
         ";
 
-                using (var cmd = new SQLiteCommand(sql, conn))
+                using (var checkCmd = new SQLiteCommand(checkSql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@date", date.ToString("yyyy-MM-dd"));
-                    cmd.Parameters.AddWithValue("@pv", item.pvEnergy);
-                    cmd.Parameters.AddWithValue("@import", item.gridImport);
-                    cmd.Parameters.AddWithValue("@export", item.gridExport);
-                    cmd.Parameters.AddWithValue("@charge", item.batteryCharge);
-                    cmd.Parameters.AddWithValue("@discharge", item.batteryDischarge);
-                    cmd.Parameters.AddWithValue("@load", item.loadEnergy);
+                    checkCmd.Parameters.AddWithValue("@date", row.Date.ToString("yyyy-MM-dd"));
+                    checkCmd.Parameters.AddWithValue("@period", row.Period);
+                    checkCmd.Parameters.AddWithValue("@dimension", dimension);
+
+                    long count = (long)checkCmd.ExecuteScalar();
+
+                    //if (count > 0)
+                    //{
+                    //    // Use your existing overwrite dialog
+                    //    using (var dlg = new FormOverwriteDialog(
+                    //        $"Solar data for {row.Date:yyyy-MM-dd} ({row.Period}) already exists.\nWhat would you like to do?"))
+                    //    {
+                    //        dlg.ShowDialog();
+                    //        Database.overwriteMode = dlg.Choice;
+
+                    //        if (Database.overwriteMode == OverwriteChoice.Skip ||
+                    //            Database.overwriteMode == OverwriteChoice.SkipAll)
+                    //            return;
+                    //    }
+                    //}
+                    if (count > 0)
+                    {
+                        if (overwriteMode == OverwriteChoice.SkipAll)
+                            return;
+
+                        if (overwriteMode == OverwriteChoice.OverwriteAll)
+                            goto DoInsert;
+
+                        if (overwriteMode == OverwriteChoice.Ask)
+                        {
+                            using (var dlg = new FormOverwriteDialog(
+                                       $"Solar data for {row.Date:yyyy-MM-dd} ({row.Period}) already exists.\nWhat would you like to do?"))
+                            {
+                                dlg.ShowDialog();
+                                overwriteMode = dlg.Choice;
+
+                                if (overwriteMode == OverwriteChoice.Skip ||
+                                    overwriteMode == OverwriteChoice.SkipAll)
+                                    return;
+
+                                // Overwrite or OverwriteAll fall through
+                            }
+                        }
+                    }
+
+                }
+
+                DoInsert:
+                string insertSql = @"
+            INSERT OR REPLACE INTO SolarData
+            (date, period, feedin, gridConsumption, chargeEnergy, dischargeEnergy, loads, pvEnergy, dimension)
+            VALUES (@date, @period, @feedin, @grid, @charge, @discharge, @loads, @pv, @dimension)
+        ";
+
+                using (var cmd = new SQLiteCommand(insertSql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@date", row.Date.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@period", row.Period);
+                    cmd.Parameters.AddWithValue("@feedin", row.FeedIn);
+                    cmd.Parameters.AddWithValue("@grid", row.GridConsumption);
+                    cmd.Parameters.AddWithValue("@charge", row.ChargeEnergy);
+                    cmd.Parameters.AddWithValue("@discharge", row.DischargeEnergy);
+                    cmd.Parameters.AddWithValue("@loads", row.Loads);
+                    cmd.Parameters.AddWithValue("@pv", row.PVEnergy);
+                    cmd.Parameters.AddWithValue("@dimension", dimension);
 
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+
 
     }
 }

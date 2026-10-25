@@ -5,6 +5,7 @@ namespace myHomeEnergyHub
 {
     public enum OverwriteChoice
     {
+        Ask,
         Overwrite,
         Skip,
         OverwriteAll,
