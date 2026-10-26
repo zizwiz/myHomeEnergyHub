@@ -241,7 +241,6 @@ namespace myHomeEnergyHub
                 BuildYearlyChart(rows);
 
             // Do after building the chart
-            ApplyXAxisLabels(rows);
             SetChartTitle(dimension, date);
         }
 
@@ -377,9 +376,12 @@ namespace myHomeEnergyHub
             chartSolar.ChartAreas.Clear();
 
             var area = new ChartArea("MainArea");
+
+            area.AxisY.MajorGrid.LineColor = Color.LightGray;
+            area.AxisX.LabelStyle.Format = "HH:mm";
+            area.AxisX.IntervalType = DateTimeIntervalType.Hours;
             area.AxisX.Interval = 1;
             area.AxisX.MajorGrid.Enabled = false;
-            area.AxisY.MajorGrid.LineColor = Color.LightGray;
 
             chartSolar.ChartAreas.Add(area);
         }
@@ -389,18 +391,17 @@ namespace myHomeEnergyHub
         {
             double longitude = double.Parse(txtbx_longitude.Text);
             double latitude = double.Parse(txtbx_latitude.Text);
+            DateTime date = dtSolarDate.Value;
 
             PrepareChart();
 
-            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList());
-            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList());
-            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList());
-            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList());
+            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date);
+            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date);
+            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date);
+            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date);
 
             chartSolar.ChartAreas[0].AxisX.Title = "Time";
             chartSolar.ChartAreas[0].AxisY.Title = "kWh";
-
-            DateTime date = dtSolarDate.Value;
 
             // work out Sunrise and Sunset times
             var sun = new Sunriset();
@@ -412,55 +413,99 @@ namespace myHomeEnergyHub
             DateTime sunset = date.Date.AddHours(sunsetUTC).ToLocalTime();
 
             // Convert to X-axis positions (1–24)
-            int sunriseX = sunrise.Hour + 1;
-            int sunsetX = sunset.Hour + 1;
+            //int sunriseX = sunrise.Hour + 1;
+            //int sunsetX = sunset.Hour + 1;
+            
+            // Convert to real position on X-Axis
+            double sunriseX = sunrise.ToOADate();
+            double sunsetX = sunset.ToOADate();
 
             // Add sunrise and Sunset Vertical lines
             var area = chartSolar.ChartAreas[0];
 
+            //var sunriseLine = new StripLine
+            //{
+            //    BorderColor = Color.Red,
+            //    BorderWidth = 2,
+            //    BorderDashStyle = ChartDashStyle.Solid,
+            //    IntervalOffset = sunriseX,
+            //    ToolTip = $"Sunrise: {sunrise:HH:mm}"
+            //};
+
+            //var sunsetLine = new StripLine
+            //{
+            //    BorderColor = Color.Red,
+            //    BorderWidth = 2,
+            //    BorderDashStyle = ChartDashStyle.Solid,
+            //    IntervalOffset = sunsetX,
+            //    ToolTip = $"Sunset: {sunset:HH:mm}"
+            //};
+
             var sunriseLine = new StripLine
             {
                 BorderColor = Color.Red,
-                BorderWidth = 2,
-                BorderDashStyle = ChartDashStyle.Solid,
+                BorderWidth = 1,
                 IntervalOffset = sunriseX,
+               // StripWidth = 0.00001,   // very thin line
                 ToolTip = $"Sunrise: {sunrise:HH:mm}"
             };
 
             var sunsetLine = new StripLine
             {
                 BorderColor = Color.Red,
-                BorderWidth = 2,
-                BorderDashStyle = ChartDashStyle.Solid,
+                BorderWidth = 1,
                 IntervalOffset = sunsetX,
+               // StripWidth = 0.00001,
                 ToolTip = $"Sunset: {sunset:HH:mm}"
             };
+
 
             area.AxisX.StripLines.Add(sunriseLine);
             area.AxisX.StripLines.Add(sunsetLine);
 
             // Add night Shading
+            //var night1 = new StripLine
+            //{
+            //    BackColor = Color.FromArgb(40, Color.DarkBlue),
+            //    StripWidth = sunriseX - 1, // midnight → sunrise
+            //    IntervalOffset = 1
+            //};
             var night1 = new StripLine
             {
                 BackColor = Color.FromArgb(40, Color.DarkBlue),
-                StripWidth = sunriseX - 1, // midnight → sunrise
-                IntervalOffset = 1
+                IntervalOffset = date.Date.ToOADate(),
+                StripWidth = sunrise.ToOADate() - date.Date.ToOADate()
             };
+
+            //var night2 = new StripLine
+            //{
+            //    BackColor = Color.FromArgb(40, Color.DarkBlue),
+            //    StripWidth = 24 - sunsetX, // sunset → midnight
+            //    IntervalOffset = sunsetX
+            //};
 
             var night2 = new StripLine
             {
                 BackColor = Color.FromArgb(40, Color.DarkBlue),
-                StripWidth = 24 - sunsetX, // sunset → midnight
-                IntervalOffset = sunsetX
+                IntervalOffset = sunset.ToOADate(),
+                StripWidth = date.Date.AddDays(1).ToOADate() - sunset.ToOADate()
             };
 
             //Add Daylight shading
+            //var day = new StripLine
+            //{
+            //    BackColor = Color.FromArgb(40, Color.Yellow),
+            //    StripWidth = sunsetX - sunriseX,
+            //    IntervalOffset = sunriseX
+            //};
+
             var day = new StripLine
             {
                 BackColor = Color.FromArgb(40, Color.Yellow),
-                StripWidth = sunsetX - sunriseX,
-                IntervalOffset = sunriseX
+                IntervalOffset = sunrise.ToOADate(),
+                StripWidth = sunset.ToOADate() - sunrise.ToOADate()
             };
+
 
             DateTime yesterday = date.AddDays(-1);
             DateTime start = yesterday.Date.AddHours(23).AddMinutes(00);
@@ -483,12 +528,14 @@ namespace myHomeEnergyHub
         // Weekly Solar Charts - method
         private void BuildMonthlyChart(List<SolarRow> rows)
         {
+            DateTime date = dtSolarDate.Value;
+
             PrepareChart();
 
-            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList());
-            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList());
-            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList());
-            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList());
+            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date);
+            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date);
+            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date);
+            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date);
 
             chartSolar.ChartAreas[0].AxisX.Title = "Day";
             chartSolar.ChartAreas[0].AxisY.Title = "kWh";
@@ -497,12 +544,14 @@ namespace myHomeEnergyHub
         // Annual Solar Charts - method
         private void BuildYearlyChart(List<SolarRow> rows)
         {
+            DateTime date = dtSolarDate.Value;
+
             PrepareChart();
 
-            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList());
-            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList());
-            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList());
-            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList());
+            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date);
+            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date);
+            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date);
+            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date);
 
             chartSolar.ChartAreas[0].AxisX.Title = "Month";
             chartSolar.ChartAreas[0].AxisY.Title = "kWh";
@@ -510,7 +559,7 @@ namespace myHomeEnergyHub
 
 
         // Solar Chart Helper to Add Series
-        private void AddSeries(string name, Color color, List<decimal> values)
+        private void AddSeries(string name, Color color, List<decimal> values, DateTime date)
         {
             var series = new Series(name);
             series.ChartType = SeriesChartType.Line;
@@ -520,9 +569,16 @@ namespace myHomeEnergyHub
 
             for (int i = 0; i < values.Count; i++)
             {
-                series.Points.AddXY(i + 1, (double)values[i]);
-                p = series.Points.AddXY(i + 1, (double)values[i]);
-                series.Points[p].ToolTip = $"{name}: {values[i]:0.###} kWh";
+                //series.Points.AddXY(i + 1, (double)values[i]);
+                //p = series.Points.AddXY(i + 1, (double)values[i]);
+                //series.Points[p].ToolTip = $"{name}: {values[i]:0.###} kWh";
+
+                DateTime xTime = date.Date.AddHours(i);   // 00:00, 01:00, 02:00...
+                double xValue = xTime.ToOADate();
+
+                p = series.Points.AddXY(xValue, (double)values[i]);
+                series.Points[p].ToolTip = $"{name}: {values[i]:0.###} kWh at {xTime:HH:mm}";
+
             }
 
             chartSolar.Series.Add(series);
