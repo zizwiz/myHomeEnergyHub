@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Drawing;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -8,6 +9,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
+using CenteredMessagebox;
 using myHomeEnergyHub.Data;
 using Newtonsoft.Json;
 
@@ -45,7 +48,7 @@ namespace myHomeEnergyHub
             PrivateData.FillData(txtbx_api_key, txtbx_electric_serial_num,
                 txtbx_electric_import_mpan, txtbx_electric_export_mpan,
                 txtbx_gas_serial_num, txtbx_gas_mprn, txtbx_foxess_api_key,
-                txtbx_foxess_device_id);
+                txtbx_foxess_device_id, txtbx_longitude, txtbx_latitude);
         }
 
         private async void btnDownloadElectric_Click(object sender, EventArgs e)
@@ -229,6 +232,17 @@ namespace myHomeEnergyHub
             {
                 Database.InsertSolarRow(row, dimension);
             }
+
+            if (dimension == "day")
+                BuildDailyChart(rows);
+            else if (dimension == "month")
+                BuildMonthlyChart(rows);
+            else if (dimension == "year")
+                BuildYearlyChart(rows);
+
+            // Do after building the chart
+            ApplyXAxisLabels(rows);
+            SetChartTitle(dimension, date);
         }
 
 
@@ -293,13 +307,17 @@ namespace myHomeEnergyHub
             var response = await client.PostAsync(url, content);
             string result = await response.Content.ReadAsStringAsync();
 
-            rchtxbx_output.AppendText(result);
-
             return result;
         }
 
         public List<SolarRow> BuildSolarRows(FoxResponse response, string dimension, DateTime date)
         {
+            if (response == null)
+            {
+                MsgBox.Show("Check the information sent is correct", "Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+
             var rows = new List<SolarRow>();
             int count = response.result[0].values.Length;
 
@@ -344,8 +362,209 @@ namespace myHomeEnergyHub
 
                 rows.Add(row);
             }
-
             return rows;
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////////
+        /// Solar Charting
+        ////////////////////////////////////////////////////////////////////////////
+
+        // Solar Chart Helper
+        private void PrepareChart()
+        {
+            chartSolar.Series.Clear();
+            chartSolar.ChartAreas.Clear();
+
+            var area = new ChartArea("MainArea");
+            area.AxisX.Interval = 1;
+            area.AxisX.MajorGrid.Enabled = false;
+            area.AxisY.MajorGrid.LineColor = Color.LightGray;
+
+            chartSolar.ChartAreas.Add(area);
+        }
+
+        // Daily Solar Charts - method
+        private void BuildDailyChart(List<SolarRow> rows)
+        {
+            double longitude = double.Parse(txtbx_longitude.Text);
+            double latitude = double.Parse(txtbx_latitude.Text);
+
+            PrepareChart();
+
+            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList());
+            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList());
+            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList());
+            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList());
+
+            chartSolar.ChartAreas[0].AxisX.Title = "Time";
+            chartSolar.ChartAreas[0].AxisY.Title = "kWh";
+
+            DateTime date = dtSolarDate.Value;
+
+            // work out Sunrise and Sunset times
+            var sun = new Sunriset();
+            double sunriseUTC = sun.CalculateSunTime(date, latitude, longitude, true);
+            double sunsetUTC = sun.CalculateSunTime(date, latitude, longitude, false);
+
+            // Convert UTC → local time
+            DateTime sunrise = date.Date.AddHours(sunriseUTC).ToLocalTime();
+            DateTime sunset = date.Date.AddHours(sunsetUTC).ToLocalTime();
+
+            // Convert to X-axis positions (1–24)
+            int sunriseX = sunrise.Hour + 1;
+            int sunsetX = sunset.Hour + 1;
+
+            // Add sunrise and Sunset Vertical lines
+            var area = chartSolar.ChartAreas[0];
+
+            var sunriseLine = new StripLine
+            {
+                BorderColor = Color.Red,
+                BorderWidth = 2,
+                BorderDashStyle = ChartDashStyle.Solid,
+                IntervalOffset = sunriseX,
+                ToolTip = $"Sunrise: {sunrise:HH:mm}"
+            };
+
+            var sunsetLine = new StripLine
+            {
+                BorderColor = Color.Red,
+                BorderWidth = 2,
+                BorderDashStyle = ChartDashStyle.Solid,
+                IntervalOffset = sunsetX,
+                ToolTip = $"Sunset: {sunset:HH:mm}"
+            };
+
+            area.AxisX.StripLines.Add(sunriseLine);
+            area.AxisX.StripLines.Add(sunsetLine);
+
+            // Add night Shading
+            var night1 = new StripLine
+            {
+                BackColor = Color.FromArgb(40, Color.DarkBlue),
+                StripWidth = sunriseX - 1, // midnight → sunrise
+                IntervalOffset = 1
+            };
+
+            var night2 = new StripLine
+            {
+                BackColor = Color.FromArgb(40, Color.DarkBlue),
+                StripWidth = 24 - sunsetX, // sunset → midnight
+                IntervalOffset = sunsetX
+            };
+
+            //Add Daylight shading
+            var day = new StripLine
+            {
+                BackColor = Color.FromArgb(40, Color.Yellow),
+                StripWidth = sunsetX - sunriseX,
+                IntervalOffset = sunriseX
+            };
+
+            DateTime yesterday = date.AddDays(-1);
+            DateTime start = yesterday.Date.AddHours(23).AddMinutes(00);
+            DateTime end = date.Date;
+
+            var beforeNight1 = new StripLine
+            {
+                BackColor = Color.FromArgb(40, Color.DarkBlue),
+                IntervalOffset = start.ToOADate(),
+                StripWidth = end.ToOADate() - start.ToOADate()
+            };
+
+            area.AxisX.StripLines.Add(beforeNight1);
+            area.AxisX.StripLines.Add(night1);
+            area.AxisX.StripLines.Add(day);
+            area.AxisX.StripLines.Add(night2);
+
+        }
+
+        // Weekly Solar Charts - method
+        private void BuildMonthlyChart(List<SolarRow> rows)
+        {
+            PrepareChart();
+
+            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList());
+            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList());
+            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList());
+            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList());
+
+            chartSolar.ChartAreas[0].AxisX.Title = "Day";
+            chartSolar.ChartAreas[0].AxisY.Title = "kWh";
+        }
+
+        // Annual Solar Charts - method
+        private void BuildYearlyChart(List<SolarRow> rows)
+        {
+            PrepareChart();
+
+            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList());
+            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList());
+            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList());
+            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList());
+
+            chartSolar.ChartAreas[0].AxisX.Title = "Month";
+            chartSolar.ChartAreas[0].AxisY.Title = "kWh";
+        }
+
+
+        // Solar Chart Helper to Add Series
+        private void AddSeries(string name, Color color, List<decimal> values)
+        {
+            var series = new Series(name);
+            series.ChartType = SeriesChartType.Line;
+            series.Color = color;
+            series.BorderWidth = 2;
+            int p;
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                series.Points.AddXY(i + 1, (double)values[i]);
+                p = series.Points.AddXY(i + 1, (double)values[i]);
+                series.Points[p].ToolTip = $"{name}: {values[i]:0.###} kWh";
+            }
+
+            chartSolar.Series.Add(series);
+        }
+
+        private void ApplyXAxisLabels(List<SolarRow> rows)
+        {
+            var area = chartSolar.ChartAreas[0];
+            area.AxisX.CustomLabels.Clear();
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                var lbl = new CustomLabel();
+                lbl.FromPosition = i + 0.5;
+                lbl.ToPosition = i + 1.5;
+                lbl.Text = rows[i].Period;
+
+                area.AxisX.CustomLabels.Add(lbl);
+            }
+        }
+
+        private void SetChartTitle(string dimension, DateTime date)
+        {
+            chartSolar.Titles.Clear();
+
+            string title = "Solar Chart";
+
+            switch (dimension)
+            {
+                case "day":
+                    title += $" — {date:dd MMM yyyy}";
+                    break;
+                case "month":
+                    title += $" — {date:MMM yyyy}";
+                    break;
+                case "year":
+                    title += $" — {date:yyyy}";
+                    break;
+            }
+
+            chartSolar.Titles.Add(title);
+            chartSolar.Titles[0].Font = new Font("Segoe UI", 12, FontStyle.Bold);
         }
 
     }

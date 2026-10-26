@@ -29,9 +29,12 @@ namespace myHomeEnergyHub
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabctrl_data = new System.Windows.Forms.TabControl();
             this.tab_dashboard = new System.Windows.Forms.TabPage();
             this.pnl_dashboard = new System.Windows.Forms.Panel();
             this.btn_fill_data = new System.Windows.Forms.Button();
@@ -84,9 +87,20 @@ namespace myHomeEnergyHub
             this.rdobtn_daily = new System.Windows.Forms.RadioButton();
             this.rdobtn_monthly = new System.Windows.Forms.RadioButton();
             this.rdobtn_annually = new System.Windows.Forms.RadioButton();
-            this.rchtxbx_output = new System.Windows.Forms.RichTextBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.tabctrl_master = new System.Windows.Forms.TabControl();
+            this.tab_data = new System.Windows.Forms.TabPage();
+            this.tab_Charts = new System.Windows.Forms.TabPage();
+            this.tabCtrl_charts = new System.Windows.Forms.TabControl();
+            this.tab_solar = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.chartSolar = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.txtbx_longitude = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.txtbx_latitude = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.tabctrl_data.SuspendLayout();
             this.tab_dashboard.SuspendLayout();
             this.pnl_dashboard.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -103,14 +117,21 @@ namespace myHomeEnergyHub
             this.pnl_solar_data.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSolar)).BeginInit();
             this.grpbx_solar.SuspendLayout();
+            this.panel1.SuspendLayout();
+            this.tabctrl_master.SuspendLayout();
+            this.tab_data.SuspendLayout();
+            this.tab_Charts.SuspendLayout();
+            this.tabCtrl_charts.SuspendLayout();
+            this.tab_solar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartSolar)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.tabControl1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.pnl_common_buttons, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -118,21 +139,21 @@ namespace myHomeEnergyHub
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 80F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1435, 689);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1435, 744);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
-            // tabControl1
+            // tabctrl_data
             // 
-            this.tabControl1.Controls.Add(this.tab_dashboard);
-            this.tabControl1.Controls.Add(this.tab_electric_data);
-            this.tabControl1.Controls.Add(this.tab_gas_data);
-            this.tabControl1.Controls.Add(this.tab_solar_data);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(3, 83);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1429, 523);
-            this.tabControl1.TabIndex = 0;
+            this.tabctrl_data.Controls.Add(this.tab_dashboard);
+            this.tabctrl_data.Controls.Add(this.tab_electric_data);
+            this.tabctrl_data.Controls.Add(this.tab_gas_data);
+            this.tabctrl_data.Controls.Add(this.tab_solar_data);
+            this.tabctrl_data.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabctrl_data.Location = new System.Drawing.Point(3, 3);
+            this.tabctrl_data.Name = "tabctrl_data";
+            this.tabctrl_data.SelectedIndex = 0;
+            this.tabctrl_data.Size = new System.Drawing.Size(1415, 539);
+            this.tabctrl_data.TabIndex = 0;
             // 
             // tab_dashboard
             // 
@@ -140,14 +161,13 @@ namespace myHomeEnergyHub
             this.tab_dashboard.Location = new System.Drawing.Point(4, 29);
             this.tab_dashboard.Name = "tab_dashboard";
             this.tab_dashboard.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_dashboard.Size = new System.Drawing.Size(1421, 490);
+            this.tab_dashboard.Size = new System.Drawing.Size(1407, 506);
             this.tab_dashboard.TabIndex = 0;
             this.tab_dashboard.Text = "DashBoard";
             this.tab_dashboard.UseVisualStyleBackColor = true;
             // 
             // pnl_dashboard
             // 
-            this.pnl_dashboard.Controls.Add(this.rchtxbx_output);
             this.pnl_dashboard.Controls.Add(this.grpbx_solar);
             this.pnl_dashboard.Controls.Add(this.btnDownloadGas);
             this.pnl_dashboard.Controls.Add(this.btn_fill_data);
@@ -157,7 +177,7 @@ namespace myHomeEnergyHub
             this.pnl_dashboard.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnl_dashboard.Location = new System.Drawing.Point(3, 3);
             this.pnl_dashboard.Name = "pnl_dashboard";
-            this.pnl_dashboard.Size = new System.Drawing.Size(1415, 484);
+            this.pnl_dashboard.Size = new System.Drawing.Size(1401, 500);
             this.pnl_dashboard.TabIndex = 0;
             // 
             // btn_fill_data
@@ -165,9 +185,9 @@ namespace myHomeEnergyHub
             this.btn_fill_data.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_fill_data.Location = new System.Drawing.Point(1218, 406);
+            this.btn_fill_data.Location = new System.Drawing.Point(429, 379);
             this.btn_fill_data.Name = "btn_fill_data";
-            this.btn_fill_data.Size = new System.Drawing.Size(156, 45);
+            this.btn_fill_data.Size = new System.Drawing.Size(158, 43);
             this.btn_fill_data.TabIndex = 32;
             this.btn_fill_data.Text = "Fill Data";
             this.btn_fill_data.UseVisualStyleBackColor = true;
@@ -273,6 +293,10 @@ namespace myHomeEnergyHub
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.txtbx_longitude);
+            this.groupBox2.Controls.Add(this.label10);
+            this.groupBox2.Controls.Add(this.txtbx_latitude);
+            this.groupBox2.Controls.Add(this.label11);
             this.groupBox2.Controls.Add(this.txtbx_foxess_device_id);
             this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.txtbx_foxess_api_key);
@@ -291,7 +315,7 @@ namespace myHomeEnergyHub
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(621, 34);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(763, 324);
+            this.groupBox2.Size = new System.Drawing.Size(763, 416);
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Octopus Data";
@@ -418,7 +442,7 @@ namespace myHomeEnergyHub
             // 
             this.pnl_common_buttons.Controls.Add(this.btn_close);
             this.pnl_common_buttons.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnl_common_buttons.Location = new System.Drawing.Point(3, 612);
+            this.pnl_common_buttons.Location = new System.Drawing.Point(3, 667);
             this.pnl_common_buttons.Name = "pnl_common_buttons";
             this.pnl_common_buttons.Size = new System.Drawing.Size(1429, 74);
             this.pnl_common_buttons.TabIndex = 1;
@@ -493,7 +517,7 @@ namespace myHomeEnergyHub
             // 
             // btnDownloadGas
             // 
-            this.btnDownloadGas.Location = new System.Drawing.Point(507, 400);
+            this.btnDownloadGas.Location = new System.Drawing.Point(429, 252);
             this.btnDownloadGas.Name = "btnDownloadGas";
             this.btnDownloadGas.Size = new System.Drawing.Size(158, 50);
             this.btnDownloadGas.TabIndex = 34;
@@ -722,19 +746,134 @@ namespace myHomeEnergyHub
             this.rdobtn_annually.Text = "Annually";
             this.rdobtn_annually.UseVisualStyleBackColor = true;
             // 
-            // rchtxbx_output
+            // panel1
             // 
-            this.rchtxbx_output.Location = new System.Drawing.Point(813, 377);
-            this.rchtxbx_output.Name = "rchtxbx_output";
-            this.rchtxbx_output.Size = new System.Drawing.Size(314, 97);
-            this.rchtxbx_output.TabIndex = 38;
-            this.rchtxbx_output.Text = "";
+            this.panel1.Controls.Add(this.tabctrl_master);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 83);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1429, 578);
+            this.panel1.TabIndex = 2;
+            // 
+            // tabctrl_master
+            // 
+            this.tabctrl_master.Controls.Add(this.tab_data);
+            this.tabctrl_master.Controls.Add(this.tab_Charts);
+            this.tabctrl_master.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabctrl_master.Location = new System.Drawing.Point(0, 0);
+            this.tabctrl_master.Name = "tabctrl_master";
+            this.tabctrl_master.SelectedIndex = 0;
+            this.tabctrl_master.Size = new System.Drawing.Size(1429, 578);
+            this.tabctrl_master.TabIndex = 0;
+            // 
+            // tab_data
+            // 
+            this.tab_data.Controls.Add(this.tabctrl_data);
+            this.tab_data.Location = new System.Drawing.Point(4, 29);
+            this.tab_data.Name = "tab_data";
+            this.tab_data.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_data.Size = new System.Drawing.Size(1421, 545);
+            this.tab_data.TabIndex = 0;
+            this.tab_data.Text = "Data";
+            this.tab_data.UseVisualStyleBackColor = true;
+            // 
+            // tab_Charts
+            // 
+            this.tab_Charts.Controls.Add(this.tabCtrl_charts);
+            this.tab_Charts.Location = new System.Drawing.Point(4, 29);
+            this.tab_Charts.Name = "tab_Charts";
+            this.tab_Charts.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_Charts.Size = new System.Drawing.Size(1421, 490);
+            this.tab_Charts.TabIndex = 1;
+            this.tab_Charts.Text = "Charts";
+            this.tab_Charts.UseVisualStyleBackColor = true;
+            // 
+            // tabCtrl_charts
+            // 
+            this.tabCtrl_charts.Controls.Add(this.tab_solar);
+            this.tabCtrl_charts.Controls.Add(this.tabPage2);
+            this.tabCtrl_charts.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabCtrl_charts.Location = new System.Drawing.Point(3, 3);
+            this.tabCtrl_charts.Name = "tabCtrl_charts";
+            this.tabCtrl_charts.SelectedIndex = 0;
+            this.tabCtrl_charts.Size = new System.Drawing.Size(1415, 484);
+            this.tabCtrl_charts.TabIndex = 0;
+            // 
+            // tab_solar
+            // 
+            this.tab_solar.Controls.Add(this.chartSolar);
+            this.tab_solar.Location = new System.Drawing.Point(4, 29);
+            this.tab_solar.Name = "tab_solar";
+            this.tab_solar.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_solar.Size = new System.Drawing.Size(1407, 451);
+            this.tab_solar.TabIndex = 0;
+            this.tab_solar.Text = "Solar";
+            this.tab_solar.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 29);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1407, 451);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "tabPage2";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // chartSolar
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chartSolar.ChartAreas.Add(chartArea1);
+            this.chartSolar.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend1.Name = "Legend1";
+            this.chartSolar.Legends.Add(legend1);
+            this.chartSolar.Location = new System.Drawing.Point(3, 3);
+            this.chartSolar.Name = "chartSolar";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chartSolar.Series.Add(series1);
+            this.chartSolar.Size = new System.Drawing.Size(1401, 445);
+            this.chartSolar.TabIndex = 0;
+            this.chartSolar.Text = "chart1";
+            // 
+            // txtbx_longitude
+            // 
+            this.txtbx_longitude.Location = new System.Drawing.Point(322, 345);
+            this.txtbx_longitude.Name = "txtbx_longitude";
+            this.txtbx_longitude.Size = new System.Drawing.Size(412, 26);
+            this.txtbx_longitude.TabIndex = 26;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(6, 345);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(80, 20);
+            this.label10.TabIndex = 25;
+            this.label10.Text = "Longitude";
+            // 
+            // txtbx_latitude
+            // 
+            this.txtbx_latitude.Location = new System.Drawing.Point(322, 380);
+            this.txtbx_latitude.Name = "txtbx_latitude";
+            this.txtbx_latitude.Size = new System.Drawing.Size(412, 26);
+            this.txtbx_latitude.TabIndex = 24;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 380);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(67, 20);
+            this.label11.TabIndex = 23;
+            this.label11.Text = "Latitude";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1435, 689);
+            this.ClientSize = new System.Drawing.Size(1435, 744);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
@@ -742,7 +881,7 @@ namespace myHomeEnergyHub
             this.Text = "myHomeEnergyHub";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.tabControl1.ResumeLayout(false);
+            this.tabctrl_data.ResumeLayout(false);
             this.tab_dashboard.ResumeLayout(false);
             this.pnl_dashboard.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
@@ -763,6 +902,13 @@ namespace myHomeEnergyHub
             ((System.ComponentModel.ISupportInitialize)(this.dgvSolar)).EndInit();
             this.grpbx_solar.ResumeLayout(false);
             this.grpbx_solar.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.tabctrl_master.ResumeLayout(false);
+            this.tab_data.ResumeLayout(false);
+            this.tab_Charts.ResumeLayout(false);
+            this.tabCtrl_charts.ResumeLayout(false);
+            this.tab_solar.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chartSolar)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -770,7 +916,7 @@ namespace myHomeEnergyHub
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tabctrl_data;
         private System.Windows.Forms.TabPage tab_dashboard;
         private System.Windows.Forms.Panel pnl_dashboard;
         private System.Windows.Forms.Button btn_fill_data;
@@ -823,7 +969,18 @@ namespace myHomeEnergyHub
         private System.Windows.Forms.RadioButton rdobtn_annually;
         private System.Windows.Forms.RadioButton rdobtn_monthly;
         private System.Windows.Forms.RadioButton rdobtn_daily;
-        private System.Windows.Forms.RichTextBox rchtxbx_output;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TabControl tabctrl_master;
+        private System.Windows.Forms.TabPage tab_data;
+        private System.Windows.Forms.TabPage tab_Charts;
+        private System.Windows.Forms.TabControl tabCtrl_charts;
+        private System.Windows.Forms.TabPage tab_solar;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartSolar;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TextBox txtbx_longitude;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox txtbx_latitude;
+        private System.Windows.Forms.Label label11;
     }
 }
 
