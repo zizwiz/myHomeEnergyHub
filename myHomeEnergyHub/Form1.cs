@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
 using CenteredMessagebox;
 using myHomeEnergyHub.Data;
 using Newtonsoft.Json;
@@ -204,8 +200,9 @@ namespace myHomeEnergyHub
                 .ToList();
         }
 
-        // FoxESS Solar Part
-
+        ///////////////////////////////////////////////
+        //             FoxESS Solar Part
+        ///////////////////////////////////////////////
         private async void btnDownloadSolar_Click(object sender, EventArgs e)
         {
             dgvSolar.DataSource = null;
@@ -235,15 +232,22 @@ namespace myHomeEnergyHub
             }
 
             if (dimension == "day")
-                BuildDailyChart(rows);
+                BuildDailySolarChart(rows);
             else if (dimension == "month")
-                BuildMonthlyChart(rows);
+                BuildMonthlySolarChart(rows);
             else if (dimension == "year")
-                BuildYearlyChart(rows);
+                BuildYearlySolarChart(rows);
+
 
             // Do after building the chart
-            ApplyXAxisLabels(rows, dimension);
-            SetChartTitle(dimension, date);
+            if (dimension == "day")
+                ChartUtils.AddSunriseSunsetShading(chartSolar, date,
+                    double.Parse(txtbx_latitude.Text),
+                    double.Parse(txtbx_longitude.Text));
+
+
+            ChartUtils.ApplyXAxisLabels(chartSolar, rows, dimension);
+            ChartUtils.SetChartTitle(chartSolar, dimension, date);
         }
 
 
@@ -371,253 +375,54 @@ namespace myHomeEnergyHub
         /// Solar Charting
         ////////////////////////////////////////////////////////////////////////////
 
-        // Solar Chart Helper
-        private void PrepareChart(string dimension)
-        {
-            chartSolar.Series.Clear();
-            chartSolar.ChartAreas.Clear();
-
-            var area = new ChartArea("MainArea");
-
-            area.AxisY.MajorGrid.LineColor = Color.LightGray;
-            area.AxisX.MajorGrid.Enabled = false;
-
-            if (dimension == "day")
-            {
-                area.AxisX.LabelStyle.Format = "HH:mm";
-                area.AxisX.IntervalType = DateTimeIntervalType.Hours;
-                area.AxisX.Interval = 1;
-
-            }
-            else
-            {
-                area.AxisX.LabelStyle.Format = "";
-                area.AxisX.IntervalType = DateTimeIntervalType.Number;
-                area.AxisX.Interval = 1;
-
-            }
-            
-            chartSolar.ChartAreas.Add(area);
-        }
-
         // Daily Solar Charts - method
-        private void BuildDailyChart(List<SolarRow> rows)
+        private void BuildDailySolarChart(List<SolarRow> rows)
         {
             double longitude = double.Parse(txtbx_longitude.Text);
             double latitude = double.Parse(txtbx_latitude.Text);
             DateTime date = dtSolarDate.Value;
 
-            PrepareChart("day");
+            ChartUtils.PrepareChart(chartSolar, "day");
 
-            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date, "day");
-            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date, "day");
-            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date, "day");
-            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date, "day");
+            ChartUtils.AddSeries(chartSolar, "Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date, "day");
+            ChartUtils.AddSeries(chartSolar, "Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date, "day");
+            ChartUtils.AddSeries(chartSolar, "Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date, "day");
+            ChartUtils.AddSeries(chartSolar, "Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date, "day");
 
             chartSolar.ChartAreas[0].AxisX.Title = "Time";
             chartSolar.ChartAreas[0].AxisY.Title = "kWh";
-
-            // work out Sunrise and Sunset times
-            var sun = new Sunriset();
-            double sunriseUTC = sun.CalculateSunTime(date, latitude, longitude, true);
-            double sunsetUTC = sun.CalculateSunTime(date, latitude, longitude, false);
-
-            // Convert UTC → local time
-            DateTime sunrise = date.Date.AddHours(sunriseUTC).ToLocalTime();
-            DateTime sunset = date.Date.AddHours(sunsetUTC).ToLocalTime();
-
-            // Convert to real position on X-Axis
-            double sunriseX = sunrise.ToOADate();
-            double sunsetX = sunset.ToOADate();
-
-            // Add sunrise and Sunset Vertical lines
-            var area = chartSolar.ChartAreas[0];
-
-           var sunriseLine = new StripLine
-            {
-                BorderColor = Color.Red,
-                BorderWidth = 1,
-                IntervalOffset = sunriseX,
-               // StripWidth = 0.00001,   // very thin line
-                ToolTip = $"Sunrise: {sunrise:HH:mm}"
-            };
-
-            var sunsetLine = new StripLine
-            {
-                BorderColor = Color.Red,
-                BorderWidth = 1,
-                IntervalOffset = sunsetX,
-               // StripWidth = 0.00001,
-                ToolTip = $"Sunset: {sunset:HH:mm}"
-            };
-
-
-            area.AxisX.StripLines.Add(sunriseLine);
-            area.AxisX.StripLines.Add(sunsetLine);
-
-            var night1 = new StripLine
-            {
-                BackColor = Color.FromArgb(40, Color.DarkBlue),
-                IntervalOffset = date.Date.ToOADate(),
-                StripWidth = sunrise.ToOADate() - date.Date.ToOADate()
-            };
-
-            var night2 = new StripLine
-            {
-                BackColor = Color.FromArgb(40, Color.DarkBlue),
-                IntervalOffset = sunset.ToOADate(),
-                StripWidth = date.Date.AddDays(1).ToOADate() - sunset.ToOADate()
-            };
-
-            var day = new StripLine
-            {
-                BackColor = Color.FromArgb(40, Color.Yellow),
-                IntervalOffset = sunrise.ToOADate(),
-                StripWidth = sunset.ToOADate() - sunrise.ToOADate()
-            };
-
-
-            DateTime yesterday = date.AddDays(-1);
-            DateTime start = yesterday.Date.AddHours(23).AddMinutes(00);
-            DateTime end = date.Date;
-
-            var beforeNight1 = new StripLine
-            {
-                BackColor = Color.FromArgb(40, Color.DarkBlue),
-                IntervalOffset = start.ToOADate(),
-                StripWidth = end.ToOADate() - start.ToOADate()
-            };
-
-            area.AxisX.StripLines.Add(beforeNight1);
-            area.AxisX.StripLines.Add(night1);
-            area.AxisX.StripLines.Add(day);
-            area.AxisX.StripLines.Add(night2);
-
         }
 
         // Weekly Solar Charts - method
-        private void BuildMonthlyChart(List<SolarRow> rows)
+        private void BuildMonthlySolarChart(List<SolarRow> rows)
         {
             DateTime date = dtSolarDate.Value;
 
-            PrepareChart("month");
+            ChartUtils.PrepareChart(chartSolar, "month");
 
-            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date, "month");
-            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date, "month");
-            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date, "month");
-            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date, "month");
+            ChartUtils.AddSeries(chartSolar, "Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date, "month");
+            ChartUtils.AddSeries(chartSolar, "Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date, "month");
+            ChartUtils.AddSeries(chartSolar, "Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date, "month");
+            ChartUtils.AddSeries(chartSolar, "Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date, "month");
 
             chartSolar.ChartAreas[0].AxisX.Title = "Day";
             chartSolar.ChartAreas[0].AxisY.Title = "kWh";
         }
 
         // Annual Solar Charts - method
-        private void BuildYearlyChart(List<SolarRow> rows)
+        private void BuildYearlySolarChart(List<SolarRow> rows)
         {
             DateTime date = dtSolarDate.Value;
 
-            PrepareChart("year");
+            ChartUtils.PrepareChart(chartSolar, "year");
 
-            AddSeries("Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date, "year");
-            AddSeries("Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date, "year");
-            AddSeries("Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date, "year");
-            AddSeries("Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date, "year");
+            ChartUtils.AddSeries(chartSolar, "Solar", Color.Gold, rows.Select(r => r.PVEnergy).ToList(), date, "year");
+            ChartUtils.AddSeries(chartSolar, "Loads", Color.Blue, rows.Select(r => r.Loads).ToList(), date, "year");
+            ChartUtils.AddSeries(chartSolar, "Grid Import", Color.Red, rows.Select(r => r.GridConsumption).ToList(), date, "year");
+            ChartUtils.AddSeries(chartSolar, "Feed-in", Color.Green, rows.Select(r => r.FeedIn).ToList(), date, "year");
 
             chartSolar.ChartAreas[0].AxisX.Title = "Month";
             chartSolar.ChartAreas[0].AxisY.Title = "kWh";
         }
-
-
-        // Solar Chart Helper to Add Series
-       
-        private void AddSeries(string name, Color color, List<decimal> values, DateTime date, string dimension)
-        {
-            var series = new Series(name);
-            series.ChartType = SeriesChartType.Line;
-            series.Color = color;
-            series.BorderWidth = 2;
-
-            for (int i = 0; i < values.Count; i++)
-            {
-                int p;
-
-                if (dimension == "day")
-                {
-                    DateTime xTime = date.Date.AddHours(i);
-                    double xValue = xTime.ToOADate();
-                    p = series.Points.AddXY(xValue, (double)values[i]);
-                    series.Points[p].ToolTip = $"{name}: {values[i]:0.###} kWh at {xTime:HH:mm}";
-                }
-                else
-                {
-                    // Monthly or yearly → numeric X-axis
-                    p = series.Points.AddXY(i + 1, (double)values[i]);
-                    series.Points[p].ToolTip = $"{name}: {values[i]:0.###} kWh";
-                }
-            }
-
-            chartSolar.Series.Add(series);
-        }
-
-
-        private void ApplyXAxisLabels(List<SolarRow> rows, string dimension)
-        {
-           if (dimension == "day")
-            {
-                return; //leave as is already in time
-            }
-
-            var area = chartSolar.ChartAreas[0];
-            area.AxisX.CustomLabels.Clear();
-
-            if (dimension == "month")
-            {
-                for (int i = 0; i < rows.Count; i++)
-                {
-                    var lbl = new CustomLabel();
-                    lbl.FromPosition = i + 0.5;
-                    lbl.ToPosition = i + 1.5;
-                    lbl.Text = $"Day {i + 1}";
-                    area.AxisX.CustomLabels.Add(lbl);
-                }
-
-            }
-            else if (dimension == "year")
-            {
-                for (int i = 0; i < rows.Count; i++)
-                {
-                    var lbl = new CustomLabel();
-                    lbl.FromPosition = i + 0.5;
-                    lbl.ToPosition = i + 1.5;
-                    lbl.Text = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i + 1);
-                    area.AxisX.CustomLabels.Add(lbl);
-                }
-
-            }
-        }
-
-        private void SetChartTitle(string dimension, DateTime date)
-        {
-            chartSolar.Titles.Clear();
-
-            string title = "Solar Chart";
-
-            switch (dimension)
-            {
-                case "day":
-                    title += $" — {date:dd MMM yyyy}";
-                    break;
-                case "month":
-                    title += $" — {date:MMM yyyy}";
-                    break;
-                case "year":
-                    title += $" — {date:yyyy}";
-                    break;
-            }
-
-            chartSolar.Titles.Add(title);
-            chartSolar.Titles[0].Font = new Font("Segoe UI", 12, FontStyle.Bold);
-        }
-
     }
 }
