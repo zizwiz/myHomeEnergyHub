@@ -29,9 +29,15 @@ namespace myHomeEnergyHub
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tabctrl_data = new System.Windows.Forms.TabControl();
@@ -93,12 +99,15 @@ namespace myHomeEnergyHub
             this.tab_Charts = new System.Windows.Forms.TabPage();
             this.tabCtrl_charts = new System.Windows.Forms.TabControl();
             this.tab_solar = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tab_electricity = new System.Windows.Forms.TabPage();
             this.chartSolar = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.txtbx_longitude = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.txtbx_latitude = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
+            this.tab_gas = new System.Windows.Forms.TabPage();
+            this.chartElectricity = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartGas = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabctrl_data.SuspendLayout();
             this.tab_dashboard.SuspendLayout();
@@ -123,7 +132,11 @@ namespace myHomeEnergyHub
             this.tab_Charts.SuspendLayout();
             this.tabCtrl_charts.SuspendLayout();
             this.tab_solar.SuspendLayout();
+            this.tab_electricity.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartSolar)).BeginInit();
+            this.tab_gas.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartElectricity)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartGas)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -783,20 +796,21 @@ namespace myHomeEnergyHub
             this.tab_Charts.Location = new System.Drawing.Point(4, 29);
             this.tab_Charts.Name = "tab_Charts";
             this.tab_Charts.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_Charts.Size = new System.Drawing.Size(1421, 490);
+            this.tab_Charts.Size = new System.Drawing.Size(1421, 545);
             this.tab_Charts.TabIndex = 1;
             this.tab_Charts.Text = "Charts";
             this.tab_Charts.UseVisualStyleBackColor = true;
             // 
             // tabCtrl_charts
             // 
+            this.tabCtrl_charts.Controls.Add(this.tab_electricity);
+            this.tabCtrl_charts.Controls.Add(this.tab_gas);
             this.tabCtrl_charts.Controls.Add(this.tab_solar);
-            this.tabCtrl_charts.Controls.Add(this.tabPage2);
             this.tabCtrl_charts.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabCtrl_charts.Location = new System.Drawing.Point(3, 3);
             this.tabCtrl_charts.Name = "tabCtrl_charts";
             this.tabCtrl_charts.SelectedIndex = 0;
-            this.tabCtrl_charts.Size = new System.Drawing.Size(1415, 484);
+            this.tabCtrl_charts.Size = new System.Drawing.Size(1415, 539);
             this.tabCtrl_charts.TabIndex = 0;
             // 
             // tab_solar
@@ -805,35 +819,36 @@ namespace myHomeEnergyHub
             this.tab_solar.Location = new System.Drawing.Point(4, 29);
             this.tab_solar.Name = "tab_solar";
             this.tab_solar.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_solar.Size = new System.Drawing.Size(1407, 451);
+            this.tab_solar.Size = new System.Drawing.Size(1407, 506);
             this.tab_solar.TabIndex = 0;
             this.tab_solar.Text = "Solar";
             this.tab_solar.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // tab_electricity
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 29);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1407, 451);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tab_electricity.Controls.Add(this.chartElectricity);
+            this.tab_electricity.Location = new System.Drawing.Point(4, 29);
+            this.tab_electricity.Name = "tab_electricity";
+            this.tab_electricity.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_electricity.Size = new System.Drawing.Size(1407, 506);
+            this.tab_electricity.TabIndex = 1;
+            this.tab_electricity.Text = "Electricity";
+            this.tab_electricity.UseVisualStyleBackColor = true;
             // 
             // chartSolar
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chartSolar.ChartAreas.Add(chartArea1);
+            chartArea3.Name = "ChartArea1";
+            this.chartSolar.ChartAreas.Add(chartArea3);
             this.chartSolar.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.chartSolar.Legends.Add(legend1);
+            legend3.Name = "Legend1";
+            this.chartSolar.Legends.Add(legend3);
             this.chartSolar.Location = new System.Drawing.Point(3, 3);
             this.chartSolar.Name = "chartSolar";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chartSolar.Series.Add(series1);
-            this.chartSolar.Size = new System.Drawing.Size(1401, 445);
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chartSolar.Series.Add(series3);
+            this.chartSolar.Size = new System.Drawing.Size(1401, 500);
             this.chartSolar.TabIndex = 0;
             this.chartSolar.Text = "chart1";
             // 
@@ -868,6 +883,50 @@ namespace myHomeEnergyHub
             this.label11.Size = new System.Drawing.Size(67, 20);
             this.label11.TabIndex = 23;
             this.label11.Text = "Latitude";
+            // 
+            // tab_gas
+            // 
+            this.tab_gas.Controls.Add(this.chartGas);
+            this.tab_gas.Location = new System.Drawing.Point(4, 29);
+            this.tab_gas.Name = "tab_gas";
+            this.tab_gas.Size = new System.Drawing.Size(1407, 506);
+            this.tab_gas.TabIndex = 2;
+            this.tab_gas.Text = "Gas";
+            this.tab_gas.UseVisualStyleBackColor = true;
+            // 
+            // chartElectricity
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chartElectricity.ChartAreas.Add(chartArea1);
+            this.chartElectricity.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend1.Name = "Legend1";
+            this.chartElectricity.Legends.Add(legend1);
+            this.chartElectricity.Location = new System.Drawing.Point(3, 3);
+            this.chartElectricity.Name = "chartElectricity";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chartElectricity.Series.Add(series1);
+            this.chartElectricity.Size = new System.Drawing.Size(1401, 500);
+            this.chartElectricity.TabIndex = 1;
+            this.chartElectricity.Text = "chart1";
+            // 
+            // chartGas
+            // 
+            chartArea2.Name = "ChartArea1";
+            this.chartGas.ChartAreas.Add(chartArea2);
+            this.chartGas.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend2.Name = "Legend1";
+            this.chartGas.Legends.Add(legend2);
+            this.chartGas.Location = new System.Drawing.Point(0, 0);
+            this.chartGas.Name = "chartGas";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chartGas.Series.Add(series2);
+            this.chartGas.Size = new System.Drawing.Size(1407, 506);
+            this.chartGas.TabIndex = 1;
+            this.chartGas.Text = "chart1";
             // 
             // Form1
             // 
@@ -908,7 +967,11 @@ namespace myHomeEnergyHub
             this.tab_Charts.ResumeLayout(false);
             this.tabCtrl_charts.ResumeLayout(false);
             this.tab_solar.ResumeLayout(false);
+            this.tab_electricity.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chartSolar)).EndInit();
+            this.tab_gas.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chartElectricity)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartGas)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -976,11 +1039,14 @@ namespace myHomeEnergyHub
         private System.Windows.Forms.TabControl tabCtrl_charts;
         private System.Windows.Forms.TabPage tab_solar;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartSolar;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tab_electricity;
         private System.Windows.Forms.TextBox txtbx_longitude;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox txtbx_latitude;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TabPage tab_gas;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartElectricity;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartGas;
     }
 }
 
