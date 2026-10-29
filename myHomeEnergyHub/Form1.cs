@@ -424,5 +424,21 @@ namespace myHomeEnergyHub
             chartSolar.ChartAreas[0].AxisX.Title = "Month";
             chartSolar.ChartAreas[0].AxisY.Title = "kWh";
         }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        /// This section gets data out of the database
+        /// and draws it to a chart
+        ////////////////////////////////////////////////////////////////////////////////////
+
+        private void btnLoadDatabase_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDrawChart_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
